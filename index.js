@@ -33,32 +33,37 @@ class Model extends EventTarget{
         this.dispatchEvent(new Event("videoHistoryChanged"));
     }
 
+    getVideoQueue(return_index=true){
+        if(return_index)
+            return this.video_queue;
+        return this.video_queue.map(v_idx => this.videos[v_idx])
+    }
     pushVideoQueue(v_idx){
         this.video_queue.push(this.videos[v_idx]);
         this.dispatchEvent(new Event("videoQueueChanged"));
     }    
-    shiftVideoQueue(){
-        const video = this.video_queue.shift();
+    shiftVideoQueue(return_index=true){
+        const v_idx = this.video_queue.shift();
         this.dispatchEvent(new Event("videoQueueChanged"));
-        return this.videos[video];
+        return return_index ? v_idx : this.videos[v_idx];
     }
     insertVideoQueue(v_idx, idx){
         this.video_queue.splice(idx, 0, this.video[v_idx]);
         this.dispatchEvent(new Event("videoQueueChanged"));
     }
     shuffleVideoQueue(){
-        shuffle(this.videos_queue);
-        this.onVideoQueueChanged.dispatchEvent();
+        shuffle(this.video_queue);
+        this.dispatchEvent(new Event("videoQueueChanged"));
     }
     
     pushVideoHistory(v_idx){
-        this.video_history.push(this.videos[v_idx]);
+        this.video_history.push(v_idx);
         this.dispatchEvent(new Event("videoQueueChanged"));
     }
-    popVideoHistory(){
-        const video = this.video_history.pop();
+    popVideoHistory(return_index=true){
+        const v_idx = this.video_history.pop();
         this.dispatchEvent(new Event("videoHistoryChanged"));
-        return this.videos[video];
+        return return_index ? v_idx : this.videos[v_idx];
     }
 }
 
@@ -67,9 +72,9 @@ class View extends EventTarget{
     /*
     Events:
         - loadVideos
-        - controllVideosShuffle
-        - controllVideosPrevious
-        - controllVideosNext    
+        - controlVideosShuffleClicked
+        - controlVideosPreviousClicked
+        - controlVideosNextClicked
     */
     constructor(){
         super();
@@ -80,9 +85,9 @@ class View extends EventTarget{
         
         this.iframe_placeholder = document.getElementById("iframe-placeholder");
         
-        this.controll_videos_shuffle = document.getElementById("controll-videos-shuffle");
-        this.controll_videos_previous = document.getElementById("controll-videos-previous");
-        this.controll_videos_next = document.getElementById("controll-videos-next");
+        this.control_videos_shuffle = document.getElementById("control-videos-shuffle");
+        this.control_videos_previous = document.getElementById("control-videos-previous");
+        this.control_videos_next = document.getElementById("control-videos-next");
         
         this.video_list = document.getElementById("video-list");
  
@@ -93,19 +98,21 @@ class View extends EventTarget{
         this.load_videos_form.addEventListener("submit", event => {
             event.preventDefault();
             const id = this.load_videos_input.value;
-            this.dispatchEvent(new Event("loadVideos", {"id" : id}));
+            let new_event = new Event("loadVideos");
+            new_event.data =  {"id" : id};
+            this.dispatchEvent(new_event);
         });
         
-        this.controll_videos_shuffle.addEventListener("click", event => {
-            this.dispatchEvent(new Event("controllVideosShuffle"));
+        this.control_videos_shuffle.addEventListener("click", event => {
+            this.dispatchEvent(new Event("controlVideosShuffleClicked"));
         });
         
-        this.controll_videos_previous.addEventListener("click", event => {
-            this.dispatchEvent(new Event("controllVideosPrevious"));
+        this.control_videos_previous.addEventListener("click", event => {
+            this.dispatchEvent(new Event("controlVideosPreviousClicked"));
         });
         
-        this.controll_videos_next.addEventListener("click", event => {
-            this.dispatchEvent(new Event("controllVideosNext"));
+        this.control_videos_next.addEventListener("click", event => {
+            this.dispatchEvent(new Event("controlVideosNextClicked"));
         });
     
     }
@@ -142,12 +149,13 @@ class View extends EventTarget{
 
 
 
-class Controller{
+class controler{
     constructor(model, view, yt_api_key){
         this.model = model;
         this.view = view;
         this.api_key = yt_api_key;
         this.player = null;
+        this.current_video_index = null;
         
         this._bindEvents();
         this._loadYouTubeAPI(); // calls "onYouTubeIframeAPIReady"
@@ -156,11 +164,14 @@ class Controller{
     _bindEvents(){
         window["onYouTubeIframeAPIReady"] = this.onYouTubeIframeAPIReady;
         
-        this.view.addEventListener("loadVideos", this.addVideosById);
-        this.view.addEventListener("controllVideosShuffle", this.controllVideoShuffle);
-        this.view.addEventListener("controllVideosPrevious", this.controllVideoPrevious);
-        this.view.addEventListener("controllVideosNext", this.controllVideoNext);
-        
+        this.view.addEventListener("loadVideos", event => {
+            this.addVideosByIdentifier(event.data.id);
+        });
+        this.view.addEventListener("controlVideosShuffleClicked", this.onControlVideoShuffleClicked);
+        this.view.addEventListener("controlVideosPreviousClicked", this.onControlVideoPreviousClicked);
+        this.view.addEventListener("controlVideosNextClicked", this.onControlVideoNextClicked);
+
+        this.model.addEventListener("videosChanged", this.onVideosChanged)
         this.model.addEventListener("videoQueueChanged", this.onVideoQueueChanged);
     }
     _loadYouTubeAPI(){ // calls "onYouTubeIframeAPIReady"
@@ -169,112 +180,151 @@ class Controller{
         let firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
-    _getVideosById(id){
+    async _fetchVideosById(id){
         if(id.length === 11){
-            // Video id
-            videos = [{
-                "id" : id,
-                "title" : "-",
-                "thumbnail" : null
-            }];
-            return videos;
+            return [await this._fetchVideo((id))];
         }else{
-            // Playlist id
-            this.fetchPlaylistVideoIds(id, (videos)=>{
-                return videos;
+            return await this._fetchPlaylist(id);
+        }
+    }
+
+    async _fetchVideo(video_id){
+        let request_url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&fields=items/snippet(title,thumbnails/default/url)&id=";
+        request_url += video_id + "&key=" + this.api_key;
+
+        const response = await fetch(request_url);
+        if(response.status !== 200)
+            throw new Error("Response status " + response.status);
+
+        const resp_json = await response.json()
+        const snippet = resp_json.items[0].snippet;
+        const thumbnail = snippet.thumbnails.default ? snippet.thumbnails.default.url : null;
+
+        return {
+            "id": video_id,
+            "title" : snippet.title,
+            "thumbnail": thumbnail
+        };
+    }
+
+    async _fetchPlaylistPage(playlist_id, page_token=null, max_results=50){
+        let request_url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&fields=items/snippet(resourceId/videoId,title,thumbnails/default/url),nextPageToken&playlistId=";
+        request_url += playlist_id + "&key=" + this.api_key + "&maxResults=" + max_results;
+        if(page_token){
+            request_url += "&pageToken=" + page_token;
+        }
+
+        const response = await fetch(request_url);
+        if(response.status !== 200)
+            throw new Error("Response status " + response.status);
+
+        return await response.json();
+    }
+
+    async _fetchPlaylist(playlist_id){
+        let playlist_data = [];
+        let current_page = null;
+
+        while(true){
+            const response = await this._fetchPlaylistPage(playlist_id, current_page);
+
+            response.items.forEach(item => {
+                const videoId = item.snippet.resourceId.videoId;
+                const title = item.snippet.title;
+                const thumbnail = item.snippet.thumbnails.default ? item.snippet.thumbnails.default.url : null;
+
+                playlist_data.push({
+                    "id": videoId,
+                    "title": title,
+                    "thumbnail": thumbnail
+                })
             });
+
+            current_page = response.nextPageToken;
+            if (!current_page) break;
+        }
+
+        return playlist_data;
+    }
+
+    _getIdFromIdentifier = identifier => {
+        let id;
+
+        let split = identifier.split("list=")
+        if(split.length === 2){
+            id = split[1];
+            let ampersand_pos = id.indexOf('&');
+            if(ampersand_pos !== -1) {
+                id = id.substring(0, ampersand_pos);
+            }
+            return id
+        }
+
+        split = identifier.split("v=");
+        if(split.length === 2){
+            id = split[1];
+            let ampersand_pos = id.indexOf('&');
+            if(ampersand_pos !== -1) {
+                id = id.substring(0, ampersand_pos);
+            }
+            return id;
         }
     }
-     
-    fetchPlaylistVideoIds(playlist, finished_cb){
-        let ids = [];
-        let that = this;
-        
-        let fetchPage = function(page, cb){
-            let maxResults = 50;
-            let requestUrl = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&fields=items/snippet(resourceId/videoId,title,thumbnails/default/url),nextPageToken&playlistId=";
-            requestUrl += playlist + "&key=" + that.api_key + "&maxResults=" + maxResults;
-            if(page){
-                requestUrl += "&pageToken=" + page;
-            }
-            
-            let httpRequest = new XMLHttpRequest();
-            httpRequest.open("GET", requestUrl, true);
-            httpRequest.send(); 
-            httpRequest.onload = () => {
-                if(httpRequest.status === 200){
-                    let response = JSON.parse(httpRequest.response);
-                    cb(response);
-                    
-                }else{
-                    console.log("ERROR", httpRequest.status, httpRequest.statusText)
-                }
-            }
+
+
+    addVideosByIdentifier = identifier =>{
+        const id = this._getIdFromIdentifier(identifier)
+        if(id === null){
+            alert("Invalid identifier!");
+            return;
         }
-        
-        let onPageFetched = function(response){
-            let container = document.getElementById("video-list");
-            
-            for(let i=0; i<response.items.length; i++){
-                let snippet = response.items[i].snippet;
-                let videoId = snippet.resourceId.videoId;
-                let title = snippet.title;
-                
-                let thumbnail;
-                try{
-                    thumbnail = snippet.thumbnails.default.url
-                }catch(TypeError){
-                    thumbnail = null;
-                }
-                
-                ids.push({
-                    "id" : videoId,
-                    "title" : title,
-                    "thumbnail" : thumbnail
-                });
-            }
-            if(response.nextPageToken){
-                fetchPage(response.nextPageToken, onPageFetched);
-            }else{
-                finished_cb(ids);
-            }
-        }
-        
-        fetchPage(null, onPageFetched);
+        this._fetchVideosById(id).then(videos => {
+            this.model.addVideos(videos);
+        });
     }
-    
-    
-    addVideosById = id =>{
-        const videos = this._getVideosById(id);
-        this.model.addVideos(videos);
-    }
-    
-    controllVideoShuffle = () => {
-        this.model.shuffleVideoQueue();
-    }
-    controllVideoPrevious = () => {
-        const video = this.model.popVideoHistory();
-        //this.model.insert(0, video.idx);
-        this.loadVideo(video.id);
-    }
-    controllVideoNext = () => {
-        const video = this.model.shiftVideoQueue();
-        this.model.pushVideoHistory(video.idx);
-        this.loadVideo(video.id);
-    }
-    
+
     loadVideo = (id) => {
         this.player.loadVideoById({
             "videoId" : id,
             "suggestedQuality" : "large"
         });
     }
-    
-    
-    onVideoQueueChanged = () => {
-        this.view.displayVideos(this.model.video_queue);
+
+    playNextVideo = () => {
+        if(this.current_video_index !== null)
+            this.model.pushVideoHistory(this.current_video_index);
+        this.current_video_index = this.model.shiftVideoQueue();
+        this.loadVideo(this.model.videos[this.current_video_index].id);
     }
+    playPreviousVideo = () => {
+        const video = this.model.popVideoHistory(false);
+        this.loadVideo(video.id);
+    }
+    shuffleVideos = () => {
+        this.model.shuffleVideoQueue();
+    }
+
+    //
+    // Handlers
+    //
     
+    onControlVideoShuffleClicked = () => {
+        this.shuffleVideos();
+    }
+    onControlVideoPreviousClicked = () => {
+        this.playPreviousVideo();
+    }
+    onControlVideoNextClicked = () => {
+        this.playNextVideo();
+    }
+
+    
+
+    onVideoQueueChanged = () => {
+        this.view.displayVideos(this.model.getVideoQueue(false));
+    }
+
+    // Called by YouTube Iframe API
     onYouTubeIframeAPIReady = () => {
         this.player = new YT.Player(this.view.iframe_placeholder, {
             height: "360",
@@ -307,7 +357,7 @@ class Controller{
 
 function ready(){
     const YT_API_KEY = "AIzaSyCt7PkKtIlJl_uVw-lRpymNR49lD919gFQ";
-    const app = new Controller(new Model(), new View(), YT_API_KEY);
+    const app = new controler(new Model(), new View(), YT_API_KEY);
 }
 
 
