@@ -22,14 +22,18 @@
         </form>
         
         <div id="iframe-placeholder"></div>
-        <div>
-            <button id="control-videos-shuffle" type="button">Shuffle</button>
-            <button id="control-videos-previous" type="button"><< Previous</button>
-            <button id="control-videos-next" type="button">Next >></button>
-        </div>
-        <div id="video-list">
-        </div>
 
-        <script src="index.js"></script>
+        <fieldset id="video-controls-fieldset" disabled>
+            <button id="video-controls-shuffle" type="button">Shuffle</button>
+            <button id="video-controls-previous" type="button"><< Previous</button>
+            <button id="video-controls-next" type="button">Next >></button>
+        </fieldset>
+
+        <div id="video-list"></div>
+
+        <script src="js/helper.js"></script>
+        <script src="js/model.js"></script>
+        <script src="js/view.js"></script>
+        <script src="js/controller.js"></script>
     </body>
 </html>
