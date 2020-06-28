@@ -330,7 +330,7 @@ class controler{
             height: "360",
             width: "640",
             playerVars: {
-                "autoplay": 0, 
+                "autoplay": 0,
                 "controls": 1
             },
             events: {
@@ -345,7 +345,10 @@ class controler{
     onYouTubePlayerReady = (event) => {
     }
     onYouTubePlayerStateChange = (event) => {
-        //const state = event.data;
+        if(event.data === 0) {
+            this.playNextVideo();
+            this.player.playVideo();
+        }
     }
     onYouTubePlayerError = (event) => {
         alert("YouTube Player Error " + event.data);
