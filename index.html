@@ -8,26 +8,31 @@
         <meta name="description" content="Rectifier for YouTube's broken playlist shuffle mode">
         <meta name="author" content="Kevin Hambrecht">
 
-        <!-- <link rel="stylesheet" href="css/styles.css?v=1.0"> -->
+        <link rel="stylesheet" href="css/reset.css">
+        <link rel="stylesheet" href="css/styles.css">
     </head>
 
 
     <body>
-        <form id="load-videos-form">
-            <fieldset id="load-videos-fieldset" disabled>
-                <label for="load-videos-input"> Playlist/Video ID/URL </label>
-                <input id="load-videos-input" name="load-videos-input" placeholder="PLVzlUNhyeioT1XMe-U12rfcozOiN6dtyE" type="text" required/>
-                <input value="Load" type="submit" />
-            </fieldset>
-        </form>
-        
-        <div id="iframe-placeholder"></div>
+        <h1>YouTube Rectifier</h1>
 
-        <fieldset id="video-controls-fieldset" disabled>
-            <button id="video-controls-shuffle" type="button">Shuffle</button>
-            <button id="video-controls-previous" type="button"><< Previous</button>
-            <button id="video-controls-next" type="button">Next >></button>
-        </fieldset>
+
+        <main>
+                <fieldset id="load-videos-fieldset" disabled>
+                    <input id="load-videos-input" placeholder="YouTube ID or URL" type="text" required />
+                    <input id="load-videos-submit" value="Load" type="submit" />
+                </fieldset>
+                <div>
+                    <div id="iframe-placeholder"></div>
+                    <fieldset id="video-controls-fieldset" disabled>
+                        <button id="video-controls-shuffle" type="button">Shuffle</button>
+                        <button id="video-controls-previous" type="button"><< Previous</button>
+                        <button id="video-controls-next" type="button">Next >></button>
+                    </fieldset>
+                </div>
+        </main>
+
+
 
         <div id="video-list"></div>
 
@@ -35,5 +40,7 @@
         <script src="js/model.js"></script>
         <script src="js/view.js"></script>
         <script src="js/controller.js"></script>
+        <script src="js/index.js"></script>
+
     </body>
 </html>

@@ -236,12 +236,3 @@ class controler{
     }
 }
 
-
-
-function ready(){
-    const YT_API_KEY = "AIzaSyCt7PkKtIlJl_uVw-lRpymNR49lD919gFQ";
-    const app = new controler(new Model(), new View(), YT_API_KEY);
-}
-
-
-document.addEventListener("DOMContentLoaded", ready, false);
