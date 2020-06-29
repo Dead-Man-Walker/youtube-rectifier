@@ -11,9 +11,9 @@ class View extends EventTarget{
     constructor(){
         super();
 
-        this.load_videos_form = document.getElementById("load-videos-form");
         this.load_videos_fieldset = document.getElementById("load-videos-fieldset");
         this.load_videos_input = document.getElementById("load-videos-input");
+        this.load_videos_submit = document.getElementById("load-videos-submit");
 
         this.iframe_placeholder = document.getElementById("iframe-placeholder");
 
@@ -28,7 +28,7 @@ class View extends EventTarget{
     }
 
     _bindEvents(){
-        this.load_videos_form.addEventListener("submit", event => {
+        this.load_videos_submit.addEventListener("click", event => {
             event.preventDefault();
             const id = this.load_videos_input.value;
             let new_event = new Event("loadVideos");

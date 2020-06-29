@@ -1,0 +1,114 @@
+
+:root{
+    --bg-color: white;
+    --second-color: #EDF2FF;
+
+    --accent-color: #008CBA;
+
+    --form-item-border-width: 4px;
+    --video-list-columns: 1;
+
+    --yt-player-width: 640px;
+    --yt-player-height: 360px;
+    --load-videos-width: 400px;
+}
+
+body{
+    background-color: var(--bg-color);
+}
+
+h1{
+    font-size: 35px;
+    color: var(--accent-color);
+    text-align: center;
+    margin: 40px auto;
+}
+
+main{
+    margin: 0 auto;
+    max-width: calc(var(--yt-player-width) + var(--load-videos-width));
+    display: flex;
+    flex-flow: row-reverse wrap;
+    justify-content: center;
+    background-color: var(--second-color);
+}
+main * {
+    margin: 5px;
+}
+
+#load-videos-fieldset{
+    max-width: var(--yt-player-width);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+}
+#load-videos-fieldset *{
+    max-height: 50px;
+    min-height: 30px;
+    flex-grow: 1;
+    display: block;
+}
+#load-videos-fieldset label{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#video-controls-fieldset{
+    display: flex;
+}
+#video-controls-fieldset *{
+    display: block;
+    flex-grow: 1;
+}
+
+
+#video-list{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+
+}
+#video-list > div{
+    width: calc(99% / var(--video-list-columns));
+    display: flex;
+    align-items: center;
+    border: 2px solid black;
+    background-color: white;
+    color: var(--accent-color);
+    transition: background-color 0.1s linear;
+}
+#video-list > div:hover{
+     background-color: var(--second-color);
+}
+#video-list > div img{
+    height: 40px;
+    margin-right: 20px;
+}
+
+
+
+
+.form-item, button, input{
+    border: none;
+    background-color: transparent;
+    color: var(--accent-color);
+    font-size: 20px;
+}
+
+.form-btn, button, input[type="button"], input[type="submit"]{
+    border: var(--accent-color) solid var(--form-item-border-width);
+    transition: background-color 0.1s linear;
+}
+.form-btn:hover, button:hover, input[type="button"]:hover, input[type="submit"]:hover{
+    background-color: white;
+}
+
+.form-input, input:not([type="button"]):not([type="submit"]){
+    border: transparent solid var(--form-item-border-width);
+    border-bottom: var(--accent-color) solid var(--form-item-border-width);
+    transition: border-color 0.1s linear;
+}
+.form-input:hover, input:not([type="button"]):not([type="submit"]):hover{
+    border: var(--accent-color) solid var(--form-item-border-width);
+}
