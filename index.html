@@ -1,6 +1,6 @@
 <!doctype html>
 
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
     <head>
         <meta charset="utf-8">
 
@@ -8,26 +8,33 @@
         <meta name="description" content="Rectifier for YouTube's broken playlist shuffle mode">
         <meta name="author" content="Kevin Hambrecht">
 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="css/reset.css">
         <link rel="stylesheet" href="css/styles.css">
     </head>
 
 
     <body>
-        <h1>YouTube Rectifier</h1>
+        <header>
+            <div>
+                <h1>YouTube Rectifier</h1><br>
+                <h2>'Cause YouTube can't...</h2>
+            </div>
+        </header>
 
 
         <main>
                 <fieldset id="load-videos-fieldset" disabled>
                     <input id="load-videos-input" placeholder="YouTube ID or URL" type="text" required />
-                    <input id="load-videos-submit" value="Load" type="submit" />
+                    <input class="green fa" id="load-videos-submit" value="&#xf067;   Add" type="submit" />
+                    <input class="red fa" id="clear-videos-submit" value="&#xf068;   Clear All" type="submit" />
                 </fieldset>
                 <div>
                     <div id="iframe-placeholder"></div>
                     <fieldset id="video-controls-fieldset" disabled>
-                        <button id="video-controls-shuffle" type="button">Shuffle</button>
-                        <button id="video-controls-previous" type="button"><< Previous</button>
-                        <button id="video-controls-next" type="button">Next >></button>
+                        <button class="yellow" id="video-controls-shuffle" type="button"><i class="fa fa-cubes"></i>Shuffle</button>
+                        <button class="blue" id="video-controls-previous" type="button"><i class="fa fa-toggle-left"></i>Previous</button>
+                        <button class="blue" id="video-controls-next" type="button">Next<i class="fa fa-toggle-right"></i></button>
                     </fieldset>
                 </div>
         </main>

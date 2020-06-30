@@ -15,6 +15,7 @@ class controler{
         window["onYouTubeIframeAPIReady"] = this.onYouTubeIframeAPIReady;
 
         this.view.addEventListener("loadVideos", this.onLoadVideos);
+        this.view.addEventListener("clearVideos", this.onClearVideos);
         this.view.addEventListener("videoControlsShuffleClicked", this.onVideoControlshuffleClicked);
         this.view.addEventListener("videoControlsPreviousClicked", this.onVideoControlsPreviousClicked);
         this.view.addEventListener("videoControlsNextClicked", this.onVideoControlsNextClicked);
@@ -159,7 +160,14 @@ class controler{
     //
 
     onLoadVideos = (event) => {
-        this.addVideosByIdentifier(event.data.id);
+        this.view.enableLoadVideosForm(false);
+        this.addVideosByIdentifier(event.data.id).finally(() => {
+            this.view.enableLoadVideosForm(true);
+        });
+    }
+
+    onClearVideos = (event) => {
+        this.model.removeVideos();
     }
 
     onVideoControlshuffleClicked = (event) => {
@@ -231,8 +239,8 @@ class controler{
             case 150:
                 console.log("Owner doesn't allow video embedding");
                 break;
-
         }
+        this.playNextVideo();
     }
 }
 

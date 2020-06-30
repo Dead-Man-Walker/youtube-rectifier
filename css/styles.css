@@ -1,9 +1,24 @@
 
 :root{
-    --bg-color: rgb(80%,80%,95%);
+    --bg-color: #008CBA;
     --second-color: white;
-
     --accent-color: #008CBA;
+    --disabled-color: rgb(140, 140, 140);
+    --disabled-light-color: rgb(210, 210, 210);
+
+    /* https://www.color-hex.com/color/ */
+    /* https://www.color-hex.com/color-palette/94569 */
+    --blue: #4caece;
+    --lightblue: #7fc5dc;
+    --green: #32b96a;
+    --lightgreen: #99dcb5;
+    --red: #c3526a;
+    --lightred: #d993a2;
+    --orange: #e78352;
+    --lightorange: #eda27e;
+    --yellow: #f4ca68;
+    --lightyellow: #f7d993;
+
 
     --form-item-border-width: 4px;
     --video-list-columns: 1;
@@ -19,14 +34,25 @@ body{
     font-family: "Trebuchet MS", Helvetica, sans-serif;
 }
 
-h1{
-    font-size: 50px;
+header{
+    color: var(--second-color);
+    margin: 55px auto;
+    display: flex;
+    justify-content: center;
     font-weight: bold;
-    letter-spacing: 6px;
-    color: var(--accent-color);
-    text-align: center;
-    margin: 45px auto;
 }
+header h1{
+    text-align: center;
+    padding: 15px;
+    font-size: 50px;
+    letter-spacing: 6px;
+    border: 6px solid white;
+}
+header h2{
+    text-align: left;
+    letter-spacing: 6px;
+}
+
 
 main{
     margin: 0 auto;
@@ -35,6 +61,7 @@ main{
     flex-flow: row-reverse wrap;
     justify-content: center;
     background-color: var(--second-color);
+    border: 3px solid black;
 }
 main * {
     margin: 5px;
@@ -47,7 +74,7 @@ main * {
     flex-direction: column;
     font-size: 20px;
 }
-#load-videos-fieldset *{
+#load-videos-fieldset > *{
     max-height: 50px;
     min-height: 30px;
     flex-grow: 1;
@@ -66,7 +93,7 @@ main * {
 #video-controls-fieldset{
     display: flex;
 }
-#video-controls-fieldset *{
+#video-controls-fieldset > *{
     display: block;
     flex-grow: 1;
 }
@@ -88,7 +115,8 @@ main * {
     transition: background-color 0.1s linear;
 }
 #video-list > div:hover{
-     background-color: var(--bg-color);
+    background-color: var(--bg-color);
+    color: white;
 }
 #video-list > div img{
     height: 40px;
@@ -101,7 +129,8 @@ main * {
 .form-item, button, input{
     border: none;
     background-color: transparent;
-    color: var(--accent-color);
+    color: white;
+    font-weight: bold;
     font-size: 20px;
 }
 
@@ -109,17 +138,53 @@ main * {
     border: var(--accent-color) solid var(--form-item-border-width);
     transition: background-color 0.1s linear;
 }
-.form-btn:hover, button:hover, input[type="button"]:hover, input[type="submit"]:hover{
-    background-color: var(--bg-color);
-}
 
 .form-input, input:not([type="button"]):not([type="submit"]){
     border: transparent solid var(--form-item-border-width);
     border-bottom: var(--accent-color) solid var(--form-item-border-width);
     transition: all 0.1s linear;
-    background-color: rgba(0, 0, 100, 0.1);
+    color: black;
+    background-color: rgba(0, 0, 0, 0.1);
+    font-weight: normal;
 }
-.form-input:hover, input:not([type="button"]):not([type="submit"]):hover{
+.form-input:hover:enabled, input:not([type="button"]):not([type="submit"]):hover:enabled{
     border: var(--accent-color) solid var(--form-item-border-width);
-    background-color: var(--bg-color);
+    background-color: var(--second-color);
+}
+
+.form-btn:disabled, .form-input:disabled, button:disabled, input:disabled{
+    color: var(--disabled-color);
+    background-color: var(--disabled-light-color);
+}
+
+
+.blue{
+    background-color: var(--lightblue);
+}
+.blue:hover:enabled{
+    background-color: var(--blue);
+}
+.green{
+    background-color: var(--lightgreen);
+}
+.green:hover:enabled{
+    background-color: var(--green);
+}
+.orange{
+    background-color: var(--lightorange);
+}
+.orange:hover:enabled{
+    background-color: var(--orange);
+}
+.red{
+    background-color: var(--lightred);
+}
+.red:hover:enabled{
+    background-color: var(--red);
+}
+.yellow{
+    background-color: var(--lightyellow);
+}
+.yellow:hover:enabled{
+    background-color: var(--yellow);
 }

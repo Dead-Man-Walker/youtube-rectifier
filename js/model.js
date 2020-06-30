@@ -26,8 +26,6 @@ class Model extends EventTarget{
             this.videos.push(video);
             this.video_queue.push(video_idx);
         }
-        [].push.apply(this.videos, videos);
-        [].push.apply(this.video_queue, [...Array(videos.length).keys()]);
 
         this.dispatchEvent(new Event("videosChanged"));
         this.dispatchEvent(new Event("videoQueueChanged"));

@@ -3,6 +3,7 @@ class View extends EventTarget{
     /*
     Events:
         - loadVideos
+        - clearVideos
         - videoControlsShuffleClicked
         - videoControlsPreviousClicked
         - videoControlsNextClicked
@@ -14,6 +15,7 @@ class View extends EventTarget{
         this.load_videos_fieldset = document.getElementById("load-videos-fieldset");
         this.load_videos_input = document.getElementById("load-videos-input");
         this.load_videos_submit = document.getElementById("load-videos-submit");
+        this.clear_videos_submit = document.getElementById("clear-videos-submit");
 
         this.iframe_placeholder = document.getElementById("iframe-placeholder");
 
@@ -35,6 +37,11 @@ class View extends EventTarget{
             new_event.data =  {"id" : id};
             this.dispatchEvent(new_event);
         });
+
+        this.clear_videos_submit.addEventListener("click", event => {
+            event.preventDefault();
+            this.dispatchEvent(new Event("clearVideos"));
+        })
 
         this.video_controls_shuffle.addEventListener("click", event => {
             this.dispatchEvent(new Event("videoControlsShuffleClicked"));
