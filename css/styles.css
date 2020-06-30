@@ -63,39 +63,53 @@ main{
     background-color: var(--second-color);
     border: 3px solid black;
 }
-main * {
-    margin: 5px;
+main > * {
+    margin: 15px;
 }
 
 #load-videos-fieldset{
     max-width: var(--yt-player-width);
-    flex-grow: 1;
+    flex: 1 1 auto;
+}
+#load-videos-fieldset > div{
+    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     font-size: 20px;
 }
-#load-videos-fieldset > *{
+#load-videos-fieldset > div > *{
+    height: 50px;
     max-height: 50px;
-    min-height: 30px;
-    flex-grow: 1;
+    flex: 1 1 auto;
     display: block;
+    margin: 5px 0;
 }
-#load-videos-fieldset label{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+#load-videos-fieldset > div :first-child{
+    margin-top: 0;
+}
+#load-videos-fieldset > div :last-child{
+    margin-bottom: 0;
 }
 
 #iframe-placeholder{
     max-width: 100%;
 }
 
-#video-controls-fieldset{
+#video-controls-fieldset > div{
     display: flex;
 }
-#video-controls-fieldset > *{
+#video-controls-fieldset > div > *{
     display: block;
-    flex-grow: 1;
+    flex: 1 1 auto;
+    margin: 5px;
+    height: 50px;
+}
+#video-controls-fieldset > div :first-child{
+    margin-left: 0;
+}
+#video-controls-fieldset > div :last-child{
+    margin-right: 0;
 }
 
 

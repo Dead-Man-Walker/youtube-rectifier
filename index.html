@@ -24,19 +24,23 @@
 
 
         <main>
-                <fieldset id="load-videos-fieldset" disabled>
+            <fieldset id="load-videos-fieldset" disabled>
+                <div>
                     <input id="load-videos-input" placeholder="YouTube ID or URL" type="text" required />
                     <input class="green fa" id="load-videos-submit" value="&#xf067;   Add" type="submit" />
                     <input class="red fa" id="clear-videos-submit" value="&#xf068;   Clear All" type="submit" />
-                </fieldset>
-                <div>
-                    <div id="iframe-placeholder"></div>
-                    <fieldset id="video-controls-fieldset" disabled>
+                </div>
+            </fieldset>
+            <div>
+                <div id="iframe-placeholder"></div>
+                <fieldset id="video-controls-fieldset" disabled>
+                    <div>
                         <button class="yellow" id="video-controls-shuffle" type="button"><i class="fa fa-cubes"></i>Shuffle</button>
                         <button class="blue" id="video-controls-previous" type="button"><i class="fa fa-toggle-left"></i>Previous</button>
                         <button class="blue" id="video-controls-next" type="button">Next<i class="fa fa-toggle-right"></i></button>
-                    </fieldset>
-                </div>
+                    </div>
+                </fieldset>
+            </div>
         </main>
 
 
@@ -51,3 +55,4 @@
 
     </body>
 </html>
+
