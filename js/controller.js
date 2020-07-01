@@ -141,8 +141,7 @@ class controler{
     }
 
     async addVideosFromUrl(){
-        const parsed_url = new URL(window.location);
-        const identifiers = parsed_url.searchParams.getAll("identifiers");
+        const identifiers = this.view.getUrlIdentifiers();
         if(identifiers.length === 0)
             return;
 
@@ -155,18 +154,8 @@ class controler{
         }
     }
 
-    writeIdentifiersToUrl(identifiers){
-        let parsed_url = new URL(document.location);
-        parsed_url.searchParams.delete("identifiers");
-
-        identifiers.forEach(identifier => {
-            parsed_url.searchParams.append("identifiers", encodeURIComponent(identifier));
-        });
-
-        window.history.pushState({}, "", parsed_url.href)
-    }
-
     playVideo = (video) => {
+        console.log("PLAYER", this.player)
         this.view.setIframeTitle(video.title);
 	    this.player.loadVideoById({
             "videoId" : video.id,
@@ -232,7 +221,7 @@ class controler{
         this.view.enableVideoControls( (this.model.video_queue.length > 0) );
     }
     onIdentifiersChanged = () => {
-        this.writeIdentifiersToUrl(this.model.identifiers);
+        this.view.setUrlIdentifiers(this.model.identifiers);
     }
 
 
@@ -251,11 +240,10 @@ class controler{
                 "onError" : this.onYouTubePlayerError
             }
         });
-
-        this.view.enableLoadVideosForm(true);
-        this.addVideosFromUrl();
     }
     onYouTubePlayerReady = (event) => {
+        this.view.enableLoadVideosForm(true);
+        this.addVideosFromUrl();
     }
     onYouTubePlayerStateChange = (event) => {
         if(event.data === 0) {

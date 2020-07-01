@@ -84,7 +84,7 @@ class View extends EventTarget{
     }
 
     setIframeTitle(title){
-	this.iframe_title.innerHTML = title;
+	    this.iframe_title.innerHTML = title;
     }
 
     _createVideoListItemElement(video){
@@ -106,6 +106,22 @@ class View extends EventTarget{
 
         return div;
     }
+
+    getUrlIdentifiers(){
+        const parsed_url = new URL(window.location);
+        return parsed_url.searchParams.getAll("identifiers");
+    }
+    setUrlIdentifiers(identifiers){
+        let parsed_url = new URL(document.location);
+        parsed_url.searchParams.delete("identifiers");
+
+        identifiers.forEach(identifier => {
+            parsed_url.searchParams.append("identifiers", encodeURIComponent(identifier));
+        });
+
+        window.history.pushState({}, "", parsed_url.href)
+    }
+
 }
 
 
