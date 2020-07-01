@@ -1,4 +1,9 @@
 
+main > div > div{
+	background: black;
+	padding: 6px;
+}
+
 :root{
     --bg-color: #008CBA;
     --second-color: white;
@@ -65,6 +70,13 @@ main{
 }
 main > * {
     margin: 15px;
+}
+
+#iframe-title{
+    background-color: black;
+    color: white;
+    font-size: 14px;
+    padding: 8px;
 }
 
 #load-videos-fieldset{

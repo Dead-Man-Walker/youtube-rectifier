@@ -17,6 +17,7 @@ class View extends EventTarget{
         this.load_videos_submit = document.getElementById("load-videos-submit");
         this.clear_videos_submit = document.getElementById("clear-videos-submit");
 
+	this.iframe_title = document.getElementById("iframe-title");
         this.iframe_placeholder = document.getElementById("iframe-placeholder");
 
         this.video_controls_fieldset = document.getElementById("video-controls-fieldset");
@@ -80,6 +81,10 @@ class View extends EventTarget{
             const item = this._createVideoListItemElement(videos[i]);
             this.video_list.appendChild(item);
         }
+    }
+
+    setIframeTitle(title){
+	this.iframe_title.innerHTML = title;
     }
 
     _createVideoListItemElement(video){

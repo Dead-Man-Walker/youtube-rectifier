@@ -133,9 +133,10 @@ class controler{
     }
 
 
-    playVideo = (id) => {
-        this.player.loadVideoById({
-            "videoId" : id,
+    playVideo = (video) => {
+	this.view.setIframeTitle(video.title);
+	this.player.loadVideoById({
+            "videoId" : video.id,
             "suggestedQuality" : "large"
         });
         this.player.playVideo();
@@ -145,11 +146,11 @@ class controler{
         if(this.current_video_index !== null)
             this.model.pushVideoHistory(this.current_video_index);
         this.current_video_index = this.model.shiftVideoQueue();
-        this.playVideo(this.model.videos[this.current_video_index].id);
+        this.playVideo(this.model.videos[this.current_video_index]);
     }
     playPreviousVideo = () => {
         const video = this.model.popVideoHistory(false);
-        this.playVideo(video.id);
+        this.playVideo(video);
     }
     shuffleVideos = () => {
         this.model.shuffleVideoQueue();

@@ -1,9 +1,9 @@
 # README #
 
 This is a small web app that rectifies YouTube's incompetence to include a working playlist shuffle mode (for more than 200 videos anyway).
+[Try a live version here](https://dead-man-walker.github.io/youtube-rectifier/)
 
-
-### How do I get set up and run this? ###
+### How do I get set this up locally? ###
 
 * Download this repository
 * Execute the *run.sh*
