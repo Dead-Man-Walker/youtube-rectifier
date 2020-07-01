@@ -5,6 +5,7 @@ class Model extends EventTarget{
         - videosChanged
         - videoQueueChanged
         - videoHistoryChanged
+        - identifiersChanged
 
     */
     constructor(){
@@ -13,7 +14,9 @@ class Model extends EventTarget{
         this.videos = [];
         this.video_queue = [];
         this.video_history = [];
+        this.identifiers = new Set();
     }
+
 
     addVideos(videos){
         const start_index = this.videos.length;
@@ -40,6 +43,7 @@ class Model extends EventTarget{
         this.dispatchEvent(new Event("videoHistoryChanged"));
     }
 
+
     getVideoQueue(index_only=true){
         if(index_only)
             return this.video_queue;
@@ -63,6 +67,7 @@ class Model extends EventTarget{
         this.dispatchEvent(new Event("videoQueueChanged"));
     }
 
+
     pushVideoHistory(v_idx){
         this.video_history.push(v_idx);
         this.dispatchEvent(new Event("videoHistoryChanged"));
@@ -71,6 +76,20 @@ class Model extends EventTarget{
         const v_idx = this.video_history.pop();
         this.dispatchEvent(new Event("videoHistoryChanged"));
         return index_only ? v_idx : this.videos[v_idx];
+    }
+
+    removeIdentifiers(){
+        this.identifiers.clear();
+        this.dispatchEvent(new Event("identifiersChanged"));
+    }
+    addIdentifier(identifier){
+        const len = this.identifiers.size;
+        this.identifiers.add(identifier);
+        if(len !== this.identifiers.size)
+            this.dispatchEvent(new Event("identifiersChanged"));
+    }
+    hasIdentifier(identifier){
+        return this.identifiers.has(identifier);
     }
 }
 

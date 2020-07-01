@@ -23,6 +23,7 @@ class controler{
 
         this.model.addEventListener("videosChanged", this.onVideosChanged)
         this.model.addEventListener("videoQueueChanged", this.onVideoQueueChanged);
+        this.model.addEventListener("identifiersChanged", this.onIdentifiersChanged);
     }
 
     _loadYouTubeAPI(){ // calls "onYouTubeIframeAPIReady"
@@ -132,8 +133,10 @@ class controler{
             console.log("Invalid identifier! " + id);
             return;
         }
+        if(this.model.hasIdentifier((id)))
+            return;
         const videos = await this._fetchVideosById(id);
-        this.addIdentifierToUrl(id);
+        this.model.addIdentifier(id);
         this.model.addVideos(videos);
     }
 
@@ -152,12 +155,14 @@ class controler{
         }
     }
 
-    addIdentifierToUrl(identifier){
+    writeIdentifiersToUrl(identifiers){
         let parsed_url = new URL(document.location);
-        const identifiers = parsed_url.searchParams.getAll("identifiers");
-        if(identifiers.includes(identifier))
-            return;
-        parsed_url.searchParams.append("identifiers", encodeURIComponent(identifier));
+        parsed_url.searchParams.delete("identifiers");
+
+        identifiers.forEach(identifier => {
+            parsed_url.searchParams.append("identifiers", encodeURIComponent(identifier));
+        });
+
         window.history.pushState({}, "", parsed_url.href)
     }
 
@@ -226,6 +231,10 @@ class controler{
         this.view.displayVideos(this.model.getVideoQueue(false));
         this.view.enableVideoControls( (this.model.video_queue.length > 0) );
     }
+    onIdentifiersChanged = () => {
+        this.writeIdentifiersToUrl(this.model.identifiers);
+    }
+
 
     // Called by YouTube Iframe API
     onYouTubeIframeAPIReady = () => {
