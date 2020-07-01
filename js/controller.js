@@ -24,12 +24,14 @@ class controler{
         this.model.addEventListener("videosChanged", this.onVideosChanged)
         this.model.addEventListener("videoQueueChanged", this.onVideoQueueChanged);
     }
+
     _loadYouTubeAPI(){ // calls "onYouTubeIframeAPIReady"
         let tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         let firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
+
     async _fetchVideosById(id){
         if(id.length === 11){
             return [await this._fetchVideo((id))];
@@ -107,7 +109,7 @@ class controler{
             if(ampersand_pos !== -1) {
                 id = id.substring(0, ampersand_pos);
             }
-            return id
+            return id;
         }
 
         split = identifier.split("v=");
@@ -119,23 +121,49 @@ class controler{
             }
             return id;
         }
+
+        return identifier;
     }
 
 
     async addVideosByIdentifier(identifier){
-        const id = this._getIdFromIdentifier(identifier)
-        if(id === null){
-            alert("Invalid identifier!");
+        const id = this._getIdFromIdentifier(identifier);
+        if(id == null){
+            console.log("Invalid identifier! " + id);
             return;
         }
         const videos = await this._fetchVideosById(id);
+        this.addIdentifierToUrl(id);
         this.model.addVideos(videos);
     }
 
+    async addVideosFromUrl(){
+        const parsed_url = new URL(window.location);
+        const identifiers = parsed_url.searchParams.getAll("identifiers");
+        if(identifiers.length === 0)
+            return;
+
+        this.view.enableLoadVideosForm(false);
+        try{
+            const promises = identifiers.map(this.addVideosByIdentifier.bind(this));
+            await Promise.all(promises);
+        }finally {
+            this.view.enableLoadVideosForm(true);
+        }
+    }
+
+    addIdentifierToUrl(identifier){
+        let parsed_url = new URL(document.location);
+        const identifiers = parsed_url.searchParams.getAll("identifiers");
+        if(identifiers.includes(identifier))
+            return;
+        parsed_url.searchParams.append("identifiers", encodeURIComponent(identifier));
+        window.history.pushState({}, "", parsed_url.href)
+    }
 
     playVideo = (video) => {
-	this.view.setIframeTitle(video.title);
-	this.player.loadVideoById({
+        this.view.setIframeTitle(video.title);
+	    this.player.loadVideoById({
             "videoId" : video.id,
             "suggestedQuality" : "large"
         });
@@ -216,6 +244,7 @@ class controler{
         });
 
         this.view.enableLoadVideosForm(true);
+        this.addVideosFromUrl();
     }
     onYouTubePlayerReady = (event) => {
     }
