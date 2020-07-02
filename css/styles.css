@@ -41,12 +41,25 @@ header{
     justify-content: center;
     font-weight: bold;
 }
-header h1{
-    text-align: center;
+
+#header-main{
+    border: 6px solid white;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
     padding: 15px;
+}
+#header-main img{
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+    align-self: center;
+}
+#header-main h1{
+    text-align: center;
     font-size: 50px;
     letter-spacing: 6px;
-    border: 6px solid white;
+    align-self: center;
 }
 header h2{
     text-align: left;
