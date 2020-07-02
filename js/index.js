@@ -16,6 +16,5 @@ document.addEventListener("DOMContentLoaded", ready, false);
 
 function updateVideoListLayout(){
     const columns = Math.max(1, parseInt(window.innerWidth / MIN_VIDEO_LIST_COLUMN_WIDTH));
-    console.log(columns)
     document.documentElement.style.setProperty("--video-list-columns", columns);
 }

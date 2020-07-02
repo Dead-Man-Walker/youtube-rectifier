@@ -23,13 +23,16 @@ class controler{
 
         this.model.addEventListener("videosChanged", this.onVideosChanged)
         this.model.addEventListener("videoQueueChanged", this.onVideoQueueChanged);
+        this.model.addEventListener("identifiersChanged", this.onIdentifiersChanged);
     }
+
     _loadYouTubeAPI(){ // calls "onYouTubeIframeAPIReady"
         let tag = document.createElement('script');
         tag.src = "https://www.youtube.com/iframe_api";
         let firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
+
     async _fetchVideosById(id){
         if(id.length === 11){
             return [await this._fetchVideo((id))];
@@ -107,7 +110,7 @@ class controler{
             if(ampersand_pos !== -1) {
                 id = id.substring(0, ampersand_pos);
             }
-            return id
+            return id;
         }
 
         split = identifier.split("v=");
@@ -119,23 +122,43 @@ class controler{
             }
             return id;
         }
+
+        return identifier;
     }
 
 
     async addVideosByIdentifier(identifier){
-        const id = this._getIdFromIdentifier(identifier)
-        if(id === null){
-            alert("Invalid identifier!");
+        const id = this._getIdFromIdentifier(identifier);
+        if(id == null){
+            console.log("Invalid identifier! " + id);
             return;
         }
+        if(this.model.hasIdentifier((id)))
+            return;
         const videos = await this._fetchVideosById(id);
+        this.model.addIdentifier(id);
         this.model.addVideos(videos);
     }
 
+    async addVideosFromUrl(){
+        const identifiers = this.view.getUrlIdentifiers();
+        if(identifiers.length === 0)
+            return;
 
-    playVideo = (id) => {
-        this.player.loadVideoById({
-            "videoId" : id,
+        this.view.enableLoadVideosForm(false);
+        try{
+            const promises = identifiers.map(this.addVideosByIdentifier.bind(this));
+            await Promise.all(promises);
+        }finally {
+            this.view.enableLoadVideosForm(true);
+        }
+    }
+
+    playVideo = (video) => {
+        console.log("PLAYER", this.player)
+        this.view.setIframeTitle(video.title);
+	    this.player.loadVideoById({
+            "videoId" : video.id,
             "suggestedQuality" : "large"
         });
         this.player.playVideo();
@@ -145,11 +168,11 @@ class controler{
         if(this.current_video_index !== null)
             this.model.pushVideoHistory(this.current_video_index);
         this.current_video_index = this.model.shiftVideoQueue();
-        this.playVideo(this.model.videos[this.current_video_index].id);
+        this.playVideo(this.model.videos[this.current_video_index]);
     }
     playPreviousVideo = () => {
         const video = this.model.popVideoHistory(false);
-        this.playVideo(video.id);
+        this.playVideo(video);
     }
     shuffleVideos = () => {
         this.model.shuffleVideoQueue();
@@ -197,6 +220,10 @@ class controler{
         this.view.displayVideos(this.model.getVideoQueue(false));
         this.view.enableVideoControls( (this.model.video_queue.length > 0) );
     }
+    onIdentifiersChanged = () => {
+        this.view.setUrlIdentifiers(this.model.identifiers);
+    }
+
 
     // Called by YouTube Iframe API
     onYouTubeIframeAPIReady = () => {
@@ -213,10 +240,10 @@ class controler{
                 "onError" : this.onYouTubePlayerError
             }
         });
-
-        this.view.enableLoadVideosForm(true);
     }
     onYouTubePlayerReady = (event) => {
+        this.view.enableLoadVideosForm(true);
+        this.addVideosFromUrl();
     }
     onYouTubePlayerStateChange = (event) => {
         if(event.data === 0) {

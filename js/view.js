@@ -17,6 +17,7 @@ class View extends EventTarget{
         this.load_videos_submit = document.getElementById("load-videos-submit");
         this.clear_videos_submit = document.getElementById("clear-videos-submit");
 
+	this.iframe_title = document.getElementById("iframe-title");
         this.iframe_placeholder = document.getElementById("iframe-placeholder");
 
         this.video_controls_fieldset = document.getElementById("video-controls-fieldset");
@@ -82,6 +83,10 @@ class View extends EventTarget{
         }
     }
 
+    setIframeTitle(title){
+	    this.iframe_title.innerHTML = title;
+    }
+
     _createVideoListItemElement(video){
         const div = document.createElement("DIV");
         div.setAttribute("data-idx", video.idx);
@@ -101,6 +106,22 @@ class View extends EventTarget{
 
         return div;
     }
+
+    getUrlIdentifiers(){
+        const parsed_url = new URL(window.location);
+        return parsed_url.searchParams.getAll("identifiers");
+    }
+    setUrlIdentifiers(identifiers){
+        let parsed_url = new URL(document.location);
+        parsed_url.searchParams.delete("identifiers");
+
+        identifiers.forEach(identifier => {
+            parsed_url.searchParams.append("identifiers", encodeURIComponent(identifier));
+        });
+
+        window.history.pushState({}, "", parsed_url.href)
+    }
+
 }
 
 
