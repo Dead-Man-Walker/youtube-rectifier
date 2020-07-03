@@ -6,6 +6,7 @@ class Model extends EventTarget{
         - videoQueueChanged
         - videoHistoryChanged
         - identifiersChanged
+        - shuffleChanged
 
     */
     constructor(){
@@ -15,6 +16,8 @@ class Model extends EventTarget{
         this.video_queue = [];
         this.video_history = [];
         this.identifiers = new Set();
+
+        this.shuffle = false;
     }
 
 
@@ -90,6 +93,13 @@ class Model extends EventTarget{
     }
     hasIdentifier(identifier){
         return this.identifiers.has(identifier);
+    }
+
+    setShuffle(state){
+        if(this.shuffle === state)
+            return;
+        this.shuffle = state;
+        this.dispatchEvent(new Event("shuffleChanged"))
     }
 }
 

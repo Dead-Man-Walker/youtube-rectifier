@@ -122,6 +122,20 @@ class View extends EventTarget{
         window.history.pushState({}, "", parsed_url.href)
     }
 
+    getUrlShuffle(){
+        const parsed_url = new URL(window.location);
+        return (parsed_url.searchParams.get("shuffle") !== null);
+    }
+    setUrlShuffle(state){
+        const parsed_url = new URL(window.location);
+        parsed_url.searchParams.delete("shuffle");
+
+        if(state){
+            parsed_url.searchParams.append("shuffle", true);
+        }
+        window.history.pushState({}, "", parsed_url.href);
+    }
+
 }
 
 

@@ -24,6 +24,7 @@ class controler{
         this.model.addEventListener("videosChanged", this.onVideosChanged)
         this.model.addEventListener("videoQueueChanged", this.onVideoQueueChanged);
         this.model.addEventListener("identifiersChanged", this.onIdentifiersChanged);
+        this.model.addEventListener("shuffleChanged", this.onShuffleChanged);
     }
 
     _loadYouTubeAPI(){ // calls "onYouTubeIframeAPIReady"
@@ -155,7 +156,6 @@ class controler{
     }
 
     playVideo = (video) => {
-        console.log("PLAYER", this.player)
         this.view.setIframeTitle(video.title);
 	    this.player.loadVideoById({
             "videoId" : video.id,
@@ -175,7 +175,7 @@ class controler{
         this.playVideo(video);
     }
     shuffleVideos = () => {
-        this.model.shuffleVideoQueue();
+        this.model.setShuffle(true)
     }
 
     //
@@ -191,6 +191,7 @@ class controler{
 
     onClearVideos = (event) => {
         this.model.removeVideos();
+        this.model.removeIdentifiers();
     }
 
     onVideoControlshuffleClicked = (event) => {
@@ -213,6 +214,8 @@ class controler{
 
     onVideosChanged = () => {
         // Load and play the very first video
+        if(this.model.shuffle)
+            this.model.shuffleVideoQueue();
         if(this.current_video_index === null)
             this.playNextVideo()
     }
@@ -222,6 +225,12 @@ class controler{
     }
     onIdentifiersChanged = () => {
         this.view.setUrlIdentifiers(this.model.identifiers);
+    }
+    onShuffleChanged = () => {
+        const state = this.model.shuffle;
+        this.view.setUrlShuffle(state);
+        if(state)
+            this.model.shuffleVideoQueue();
     }
 
 
@@ -243,6 +252,7 @@ class controler{
     }
     onYouTubePlayerReady = (event) => {
         this.view.enableLoadVideosForm(true);
+        this.model.setShuffle(this.view.getUrlShuffle());
         this.addVideosFromUrl();
     }
     onYouTubePlayerStateChange = (event) => {

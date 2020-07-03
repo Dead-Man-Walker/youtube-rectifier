@@ -13,16 +13,16 @@ main > div > div{
 
     /* https://www.color-hex.com/color/ */
     /* https://www.color-hex.com/color-palette/94569 */
-    --blue: #4caece;
-    --lightblue: #7fc5dc;
-    --green: #32b96a;
-    --lightgreen: #99dcb5;
-    --red: #c3526a;
-    --lightred: #d993a2;
-    --orange: #e78352;
-    --lightorange: #eda27e;
-    --yellow: #f4ca68;
-    --lightyellow: #f7d993;
+    --blue: #3c8ba4;
+    --lightblue: #4caece;
+    --green: #23814a;
+    --lightgreen: #32b96a;
+    --red: #88394a;
+    --lightred: #c3526a;
+    --orange: #b86841;
+    --lightorange: #e78352;
+    --yellow: #c3a153;
+    --lightyellow: #f4ca68;
 
 
     --form-item-border-width: 4px;
@@ -79,7 +79,6 @@ main{
     flex-flow: row-reverse wrap;
     justify-content: center;
     background-color: var(--second-color);
-    border: 3px solid black;
 }
 main > * {
     margin: 15px;
@@ -139,6 +138,7 @@ main > * {
 
 
 #video-list{
+    margin-top: 20px;
     display: flex;
     flex-flow: row wrap;
     justify-content: space-evenly;
@@ -148,7 +148,8 @@ main > * {
     width: calc(99% / var(--video-list-columns));
     display: flex;
     align-items: center;
-    border: 2px solid black;
+    /*border: 2px solid black;*/
+    margin: 2px;
     background-color: white;
     color: var(--accent-color);
     transition: background-color 0.1s linear;
