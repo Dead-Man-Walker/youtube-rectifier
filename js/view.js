@@ -12,12 +12,21 @@ class View extends EventTarget{
     constructor(){
         super();
 
+        this.video_list_template = ejs.compile(`
+            <% videos.forEach(video => {%>
+                <div data-idx="<%= video.idx %>">
+                    <img src="<%= video.thumbnail %>">
+                    <span><%= video.title %></span>
+                </div>
+            <% }); %>
+        `);
+
         this.load_videos_fieldset = document.getElementById("load-videos-fieldset");
         this.load_videos_input = document.getElementById("load-videos-input");
         this.load_videos_submit = document.getElementById("load-videos-submit");
         this.clear_videos_submit = document.getElementById("clear-videos-submit");
 
-	this.iframe_title = document.getElementById("iframe-title");
+	    this.iframe_title = document.getElementById("iframe-title");
         this.iframe_placeholder = document.getElementById("iframe-placeholder");
 
         this.video_controls_fieldset = document.getElementById("video-controls-fieldset");
@@ -77,16 +86,27 @@ class View extends EventTarget{
     displayVideos(videos){
         this.removeVideos();
 
+        const html = this.video_list_template({"videos" : videos});
+        this.video_list.innerHTML = html;
+
+        const that = this;
+        this.video_list.childNodes.forEach(node => {
+            node.addEventListener("click", function(event){
+                let new_event = new Event("videoListItemClicked");
+                new_event.data = {"idx": this.getAttribute("data-idx")};
+                that.dispatchEvent(new_event);
+            });
+        });
+
+        /*
         for(let i=0; i<videos.length; i++){
-            const item = this._createVideoListItemElement(videos[i]);
-            this.video_list.appendChild(item);
-        }
+            //const item = this._createVideoListItemElement(videos[i]);
+            //this.video_list.appendChild(item);
+            const item = template({video: videos[i]});
+            this.video_list.innerHTML += item;
+        }*/
     }
-
-    setIframeTitle(title){
-	    this.iframe_title.innerHTML = title;
-    }
-
+    /*
     _createVideoListItemElement(video){
         const div = document.createElement("DIV");
         div.setAttribute("data-idx", video.idx);
@@ -105,6 +125,10 @@ class View extends EventTarget{
         });
 
         return div;
+    }*/
+
+    setIframeTitle(title){
+	    this.iframe_title.innerHTML = title;
     }
 
     getUrlIdentifiers(){
