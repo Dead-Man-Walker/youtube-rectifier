@@ -13,18 +13,20 @@ class controler{
 
     _bindEvents(){
         window["onYouTubeIframeAPIReady"] = this.onYouTubeIframeAPIReady;
+        const ve = this.view.constructor.EVENTS;
+        const me = this.model.constructor.EVENTS;
 
-        this.view.addEventListener("loadVideos", this.onLoadVideos);
-        this.view.addEventListener("clearVideos", this.onClearVideos);
-        this.view.addEventListener("videoControlsShuffleClicked", this.onVideoControlshuffleClicked);
-        this.view.addEventListener("videoControlsPreviousClicked", this.onVideoControlsPreviousClicked);
-        this.view.addEventListener("videoControlsNextClicked", this.onVideoControlsNextClicked);
-        this.view.addEventListener("videoListItemClicked", this.onVideoListItemClicked);
+        this.view.addEventListener(ve.LOAD_VIDEOS_CLICKED, this.onLoadVideos);
+        this.view.addEventListener(ve.CLEAR_VIDEOS_CLICKED, this.onClearVideos);
+        this.view.addEventListener(ve.VIDEO_CONTROLS_SHUFFLE_CLICKED, this.onVideoControlshuffleClicked);
+        this.view.addEventListener(ve.VIDEO_CONTROLS_PREVIOUS_CLICKED, this.onVideoControlsPreviousClicked);
+        this.view.addEventListener(ve.VIDEO_CONTROLS_NEXT_CLICKED, this.onVideoControlsNextClicked);
+        this.view.addEventListener(ve.VIDEO_LIST_ITEM_CLICKED, this.onVideoListItemClicked);
 
-        this.model.addEventListener("videosChanged", this.onVideosChanged)
-        this.model.addEventListener("videoQueueChanged", this.onVideoQueueChanged);
-        this.model.addEventListener("identifiersChanged", this.onIdentifiersChanged);
-        this.model.addEventListener("shuffleChanged", this.onShuffleChanged);
+        this.model.addEventListener(me.VIDEOS_CHANGED, this.onVideosChanged)
+        this.model.addEventListener(me.VIDEO_QUEUE_CHANGED, this.onVideoQueueChanged);
+        this.model.addEventListener(me.IDENTIFIERS_CHANGED, this.onIdentifiersChanged);
+        this.model.addEventListener(me.SHUFFLE_CHANGED, this.onShuffleChanged);
     }
 
     _loadYouTubeAPI(){ // calls "onYouTubeIframeAPIReady"

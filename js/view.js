@@ -1,14 +1,15 @@
 
 class View extends EventTarget{
-    /*
-    Events:
-        - loadVideos
-        - clearVideos
-        - videoControlsShuffleClicked
-        - videoControlsPreviousClicked
-        - videoControlsNextClicked
-        - videoListItemClicked
-    */
+
+    static EVENTS = class{
+        static LOAD_VIDEOS_CLICKED = "loadVideosClicked";
+        static CLEAR_VIDEOS_CLICKED = "clearVideosClicked";
+        static VIDEO_CONTROLS_SHUFFLE_CLICKED = "videoControlsShuffleClicked";
+        static VIDEO_CONTROLS_PREVIOUS_CLICKED = "videoControlsPreviousClicked";
+        static VIDEO_CONTROLS_NEXT_CLICKED = "videoControlsNextClicked";
+        static VIDEO_LIST_ITEM_CLICKED = "videoListItemClicked";
+    }
+
     constructor(){
         super();
 
@@ -43,26 +44,26 @@ class View extends EventTarget{
         this.load_videos_submit.addEventListener("click", event => {
             event.preventDefault();
             const id = this.load_videos_input.value;
-            let new_event = new Event("loadVideos");
+            let new_event = new Event(View.EVENTS.LOAD_VIDEOS_CLICKED);
             new_event.data =  {"id" : id};
             this.dispatchEvent(new_event);
         });
 
         this.clear_videos_submit.addEventListener("click", event => {
             event.preventDefault();
-            this.dispatchEvent(new Event("clearVideos"));
+            this.dispatchEvent(new Event(View.EVENTS.CLEAR_VIDEOS_CLICKED));
         })
 
         this.video_controls_shuffle.addEventListener("click", event => {
-            this.dispatchEvent(new Event("videoControlsShuffleClicked"));
+            this.dispatchEvent(new Event(View.EVENTS.VIDEO_CONTROLS_SHUFFLE_CLICKED));
         });
 
         this.video_controls_previous.addEventListener("click", event => {
-            this.dispatchEvent(new Event("videoControlsPreviousClicked"));
+            this.dispatchEvent(new Event(View.EVENTS.VIDEO_CONTROLS_PREVIOUS_CLICKED));
         });
 
         this.video_controls_next.addEventListener("click", event => {
-            this.dispatchEvent(new Event("videoControlsNextClicked"));
+            this.dispatchEvent(new Event(View.EVENTS.VIDEO_CONTROLS_NEXT_CLICKED));
         });
 
     }
@@ -92,7 +93,7 @@ class View extends EventTarget{
         const that = this;
         this.video_list.childNodes.forEach(node => {
             node.addEventListener("click", function(event){
-                let new_event = new Event("videoListItemClicked");
+                let new_event = new Event(View.EVENTS.VIDEO_LIST_ITEM_CLICKED);
                 new_event.data = {"idx": this.getAttribute("data-idx")};
                 that.dispatchEvent(new_event);
             });
