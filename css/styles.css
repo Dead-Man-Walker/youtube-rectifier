@@ -122,18 +122,27 @@ main > * {
 
 #video-controls-fieldset > div{
     display: flex;
+    height: 50px;
 }
 #video-controls-fieldset > div > *{
     display: block;
-    flex: 1 1 auto;
+    flex: 1 1;
     margin: 5px;
-    height: 50px;
+    width: 100%;
+    height: 100%;
 }
-#video-controls-fieldset > div :first-child{
+#video-controls-fieldset > div > *:first-child{
     margin-left: 0;
 }
-#video-controls-fieldset > div :last-child{
+#video-controls-fieldset > div > *:last-child{
     margin-right: 0;
+}
+#video-controls-fieldset button{
+    width: 100%;
+    height: 100%;
+}
+#video-controls-fieldset button i{
+    margin-right: 10px;
 }
 
 
