@@ -135,7 +135,6 @@ class View extends EventTarget{
     }*/
 
     setVideoOrdered(state){
-        console.log("setVideoOrdered", state)
         this.video_controls_ordered.style.display = state ? 'none' : 'block';
         this.video_controls_randomized.style.display = state ? 'block' : 'none';
     }

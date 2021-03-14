@@ -162,6 +162,7 @@ class Controler{
     }
 
     playVideo = (video) => {
+        this.current_video_index = video.idx;
         this.view.setIframeTitle(video.title);
 	    this.player.loadVideoById({
             "videoId" : video.id,
@@ -173,11 +174,13 @@ class Controler{
     playNextVideo = () => {
         if(this.current_video_index !== null)
             this.model.pushVideoHistory(this.current_video_index);
-        this.current_video_index = this.model.shiftVideoQueue();
-        this.playVideo(this.model.videos[this.current_video_index]);
+        this.playVideo(this.model.shiftVideoQueue(false));
     }
     playPreviousVideo = () => {
         const video = this.model.popVideoHistory(false);
+        if(video === null)
+            return;
+        this.model.insertVideoQueue(this.current_video_index, 0);
         this.playVideo(video);
     }
 

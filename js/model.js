@@ -37,9 +37,9 @@ class Model extends EventTarget{
         this.dispatchEvent(new Event(Model.EVENTS.VIDEO_QUEUE_CHANGED));
     }
     removeVideos(){
-        this.videos = [];
-        this.videos_queue = [];
-        this.videos_history = [];
+        this.videos = []; // [{idx: <index>, ...}]
+        this.videos_queue = []; // [<videos.idx>]
+        this.videos_history = []; // [<videos.idx>]
 
         this.dispatchEvent(new Event(Model.EVENTS.VIDEOS_CHANGED));
         this.dispatchEvent(new Event(Model.EVENTS.VIDEO_QUEUE_CHANGED));
@@ -53,7 +53,7 @@ class Model extends EventTarget{
         return this.video_queue.map(v_idx => this.videos[v_idx])
     }
     pushVideoQueue(v_idx){
-        this.video_queue.push(this.videos[v_idx]);
+        this.video_queue.push(v_idx);
         this.dispatchEvent(new Event(Model.EVENTS.VIDEO_QUEUE_CHANGED));
     }
     shiftVideoQueue(index_only=true){
@@ -81,6 +81,8 @@ class Model extends EventTarget{
     }
     popVideoHistory(index_only=true){
         const v_idx = this.video_history.pop();
+        if(typeof v_idx === 'undefined')
+            return null;
         this.dispatchEvent(new Event(Model.EVENTS.VIDEO_HISTORY_CHANGED));
         return index_only ? v_idx : this.videos[v_idx];
     }
