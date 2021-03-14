@@ -1,5 +1,8 @@
 
-class controler{
+/* YouTubbe Iframe API: https://developers.google.com/youtube/iframe_api_reference */
+
+class Controler{
+
     constructor(model, view, yt_api_key){
         this.model = model;
         this.view = view;
@@ -258,7 +261,7 @@ class controler{
         this.addVideosFromUrl();
     }
     onYouTubePlayerStateChange = (event) => {
-        if(event.data === 0) {
+        if(event.data === YT.PlayerState.ENDED) {
             this.playNextVideo();
         }
     }
@@ -282,4 +285,3 @@ class controler{
         this.playNextVideo();
     }
 }
-

@@ -3,7 +3,7 @@ const MIN_VIDEO_LIST_COLUMN_WIDTH = 500;
 
 function ready(){
     const YT_API_KEY = "AIzaSyCt7PkKtIlJl_uVw-lRpymNR49lD919gFQ";
-    const app = new controler(new Model(), new View(), YT_API_KEY);
+    const app = new Controler(new Model(), new View(), YT_API_KEY);
 
     updateVideoListLayout();
     window.addEventListener("resize", updateVideoListLayout);
