@@ -21,7 +21,8 @@ class Controler{
 
         this.view.addEventListener(ve.LOAD_VIDEOS_CLICKED, this.onLoadVideos);
         this.view.addEventListener(ve.CLEAR_VIDEOS_CLICKED, this.onClearVideos);
-        this.view.addEventListener(ve.VIDEO_CONTROLS_SHUFFLE_CLICKED, this.onVideoControlshuffleClicked);
+        this.view.addEventListener(ve.VIDEO_CONTROLS_RANDOMIZED_CLICKED, this.onVideoControlsRandomizedClicked);
+        this.view.addEventListener(ve.VIDEO_CONTROLS_ORDERED_CLICKED, this.onVideoControlsOrderedClicked);
         this.view.addEventListener(ve.VIDEO_CONTROLS_PREVIOUS_CLICKED, this.onVideoControlsPreviousClicked);
         this.view.addEventListener(ve.VIDEO_CONTROLS_NEXT_CLICKED, this.onVideoControlsNextClicked);
         this.view.addEventListener(ve.VIDEO_LIST_ITEM_CLICKED, this.onVideoListItemClicked);
@@ -179,9 +180,6 @@ class Controler{
         const video = this.model.popVideoHistory(false);
         this.playVideo(video);
     }
-    shuffleVideos = () => {
-        this.model.setShuffle(true)
-    }
 
     //
     // Handlers
@@ -199,8 +197,11 @@ class Controler{
         this.model.removeIdentifiers();
     }
 
-    onVideoControlshuffleClicked = (event) => {
-        this.shuffleVideos();
+    onVideoControlsRandomizedClicked = (event) => {
+        this.model.setShuffle(true)
+    }
+    onVideoControlsOrderedClicked = (event) => {
+        this.model.setShuffle(false)
     }
     onVideoControlsPreviousClicked = (event) => {
         this.playPreviousVideo();
@@ -234,8 +235,11 @@ class Controler{
     onShuffleChanged = () => {
         const state = this.model.shuffle;
         this.view.setUrlShuffle(state);
+        this.view.setVideoOrdered(!state);
         if(state)
             this.model.shuffleVideoQueue();
+        else
+            this.model.resetVideoQueue();
     }
 
 
@@ -257,7 +261,9 @@ class Controler{
     }
     onYouTubePlayerReady = (event) => {
         this.view.enableLoadVideosForm(true);
-        this.model.setShuffle(this.view.getUrlShuffle());
+        const shuffle_state = this.view.getUrlShuffle()
+        this.model.setShuffle(shuffle_state);
+        this.view.setVideoOrdered(!shuffle_state);
         this.addVideosFromUrl();
     }
     onYouTubePlayerStateChange = (event) => {

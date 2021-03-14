@@ -69,6 +69,10 @@ class Model extends EventTarget{
         shuffle(this.video_queue);
         this.dispatchEvent(new Event(Model.EVENTS.VIDEO_QUEUE_CHANGED));
     }
+    resetVideoQueue(){
+        this.video_queue = [...Array(this.videos.length).keys()];
+        this.dispatchEvent(new Event(Model.EVENTS.VIDEO_QUEUE_CHANGED));
+    }
 
 
     pushVideoHistory(v_idx){

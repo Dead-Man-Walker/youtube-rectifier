@@ -4,7 +4,8 @@ class View extends EventTarget{
     static EVENTS = class{
         static LOAD_VIDEOS_CLICKED = "loadVideosClicked";
         static CLEAR_VIDEOS_CLICKED = "clearVideosClicked";
-        static VIDEO_CONTROLS_SHUFFLE_CLICKED = "videoControlsShuffleClicked";
+        static VIDEO_CONTROLS_RANDOMIZED_CLICKED = "videoControlsRandomizedClicked";
+        static VIDEO_CONTROLS_ORDERED_CLICKED = "videoControlsOrderedClicked";
         static VIDEO_CONTROLS_PREVIOUS_CLICKED = "videoControlsPreviousClicked";
         static VIDEO_CONTROLS_NEXT_CLICKED = "videoControlsNextClicked";
         static VIDEO_LIST_ITEM_CLICKED = "videoListItemClicked";
@@ -31,7 +32,8 @@ class View extends EventTarget{
         this.iframe_placeholder = document.getElementById("iframe-placeholder");
 
         this.video_controls_fieldset = document.getElementById("video-controls-fieldset");
-        this.video_controls_shuffle = document.getElementById("video-controls-shuffle");
+        this.video_controls_randomized = document.getElementById("video-controls-randomized");
+        this.video_controls_ordered = document.getElementById("video-controls-ordered");
         this.video_controls_previous = document.getElementById("video-controls-previous");
         this.video_controls_next = document.getElementById("video-controls-next");
 
@@ -54,8 +56,12 @@ class View extends EventTarget{
             this.dispatchEvent(new Event(View.EVENTS.CLEAR_VIDEOS_CLICKED));
         })
 
-        this.video_controls_shuffle.addEventListener("click", event => {
-            this.dispatchEvent(new Event(View.EVENTS.VIDEO_CONTROLS_SHUFFLE_CLICKED));
+        this.video_controls_randomized.addEventListener("click", event => {
+            this.dispatchEvent(new Event(View.EVENTS.VIDEO_CONTROLS_RANDOMIZED_CLICKED));
+        });
+
+        this.video_controls_ordered.addEventListener("click", event => {
+            this.dispatchEvent(new Event(View.EVENTS.VIDEO_CONTROLS_ORDERED_CLICKED));
         });
 
         this.video_controls_previous.addEventListener("click", event => {
@@ -127,6 +133,12 @@ class View extends EventTarget{
 
         return div;
     }*/
+
+    setVideoOrdered(state){
+        console.log("setVideoOrdered", state)
+        this.video_controls_ordered.style.display = state ? 'none' : 'block';
+        this.video_controls_randomized.style.display = state ? 'block' : 'none';
+    }
 
     setIframeTitle(title){
 	    this.iframe_title.innerHTML = title;
