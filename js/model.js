@@ -21,6 +21,9 @@ class Model extends EventTarget{
     }
 
 
+    getVideos(){
+        return this.videos;
+    }
     addVideos(videos){
         const start_index = this.videos.length;
         for(let i=0; i<videos.length; i++){

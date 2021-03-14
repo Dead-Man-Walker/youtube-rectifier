@@ -24,6 +24,7 @@ main > div > div{
     --yellow: #c3a153;
     --lightyellow: #f4ca68;
 
+    --form-input-height: 50px;
 
     --form-item-border-width: 4px;
     --video-list-columns: 1;
@@ -37,6 +38,9 @@ body{
     background-color: var(--bg-color);
 
     font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+body * {
+    box-sizing: border-box;
 }
 
 header{
@@ -103,8 +107,8 @@ main > * {
     font-size: 20px;
 }
 #load-videos-fieldset > div > *{
-    height: 50px;
-    max-height: 50px;
+    height: var(--form-input-height);
+    max-height: var(--form-input-height);
     flex: 1 1 auto;
     display: block;
     margin: 5px 0;
@@ -122,7 +126,7 @@ main > * {
 
 #video-controls-fieldset > div{
     display: flex;
-    height: 50px;
+    height: var(--form-input-height);
 }
 #video-controls-fieldset > div > *{
     display: block;
@@ -172,6 +176,13 @@ main > * {
     margin-right: 20px;
 }
 
+#video-search-fieldset{
+    margin-top: 15px;
+    height: var(--form-input-height);
+}
+#video-search-fieldset *{
+    height: 100%;
+}
 
 
 

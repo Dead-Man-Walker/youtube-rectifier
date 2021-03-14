@@ -10,6 +10,8 @@ class Controler{
         this.player = null;
         this.current_video_index = null;
 
+        this.SEARCH_MIN_CHARACTERS = 3;
+
         this._bindEvents();
         this._loadYouTubeAPI(); // calls "onYouTubeIframeAPIReady"
     }
@@ -26,11 +28,13 @@ class Controler{
         this.view.addEventListener(ve.VIDEO_CONTROLS_PREVIOUS_CLICKED, this.onVideoControlsPreviousClicked);
         this.view.addEventListener(ve.VIDEO_CONTROLS_NEXT_CLICKED, this.onVideoControlsNextClicked);
         this.view.addEventListener(ve.VIDEO_LIST_ITEM_CLICKED, this.onVideoListItemClicked);
+        this.view.addEventListener(ve.SEARCH_VIDEOS_CHANGED, this.onSearchVideos);
 
         this.model.addEventListener(me.VIDEOS_CHANGED, this.onVideosChanged)
         this.model.addEventListener(me.VIDEO_QUEUE_CHANGED, this.onVideoQueueChanged);
         this.model.addEventListener(me.IDENTIFIERS_CHANGED, this.onIdentifiersChanged);
         this.model.addEventListener(me.SHUFFLE_CHANGED, this.onShuffleChanged);
+
     }
 
     _loadYouTubeAPI(){ // calls "onYouTubeIframeAPIReady"
@@ -217,6 +221,18 @@ class Controler{
         const idx = event.data.idx;
         this.model.insertVideoQueue(idx, 0);
         this.playNextVideo();
+    }
+
+    onSearchVideos = (event) => {
+        const data = event.data.data;
+        if(data.length < this.SEARCH_MIN_CHARACTERS) {
+            this.view.displayVideos(this.model.getVideoQueue(false));
+            return;
+        }
+        const filtered_videos = this.model.getVideos().filter(video_data => {
+           return  video_data.id.toLowerCase().includes(data) || video_data.title.toLowerCase().includes(data);
+        });
+        this.view.displayVideos(filtered_videos);
     }
 
 

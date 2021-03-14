@@ -9,6 +9,7 @@ class View extends EventTarget{
         static VIDEO_CONTROLS_PREVIOUS_CLICKED = "videoControlsPreviousClicked";
         static VIDEO_CONTROLS_NEXT_CLICKED = "videoControlsNextClicked";
         static VIDEO_LIST_ITEM_CLICKED = "videoListItemClicked";
+        static SEARCH_VIDEOS_CHANGED = "searchVideosChanged";
     }
 
     constructor(){
@@ -36,6 +37,8 @@ class View extends EventTarget{
         this.video_controls_ordered = document.getElementById("video-controls-ordered");
         this.video_controls_previous = document.getElementById("video-controls-previous");
         this.video_controls_next = document.getElementById("video-controls-next");
+
+        this.search_videos_input = document.getElementById("search-videos-input");
 
         this.video_list = document.getElementById("video-list");
 
@@ -70,6 +73,13 @@ class View extends EventTarget{
 
         this.video_controls_next.addEventListener("click", event => {
             this.dispatchEvent(new Event(View.EVENTS.VIDEO_CONTROLS_NEXT_CLICKED));
+        });
+
+        this.search_videos_input.addEventListener("input", event => {
+            const data = this.search_videos_input.value;
+            let new_event = new Event(View.EVENTS.SEARCH_VIDEOS_CHANGED);
+            new_event.data = {"data" : data};
+            this.dispatchEvent(new_event);
         });
 
     }
