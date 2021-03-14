@@ -7,6 +7,9 @@ function ready(){
 
     updateVideoListLayout();
     window.addEventListener("resize", updateVideoListLayout);
+
+    const tooltip = new Tooltip();
+    tooltip.applyAll();
 }
 
 
