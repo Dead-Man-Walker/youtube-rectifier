@@ -19,7 +19,7 @@ class Tooltip{
         padding: 5px;
         color: black;
         background: rgba(150,150,150,0.7);
-        border-radius: 15%;
+        border-radius: 8px;
     `;
     static OPTIONS = {
         tooltipClass: 'tooltip',

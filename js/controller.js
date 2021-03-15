@@ -7,6 +7,7 @@ class Controler{
         this.model = model;
         this.view = view;
         this.api_key = yt_api_key;
+        this.filter_controller = new FilterController(this.model);
         this.player = null;
         this.current_video_index = null;
 
@@ -229,9 +230,7 @@ class Controler{
             this.view.displayVideos(this.model.getVideoQueue(false));
             return;
         }
-        const filtered_videos = this.model.getVideos().filter(video_data => {
-           return  video_data.id.toLowerCase().includes(data) || video_data.title.toLowerCase().includes(data);
-        });
+        const filtered_videos = this.filter_controller.fitlerBy(data);
         this.view.displayVideos(filtered_videos);
     }
 
@@ -308,5 +307,38 @@ class Controler{
                 break;
         }
         this.playNextVideo();
+    }
+}
+
+class FilterController{
+    constructor(model){
+        this.model = model;
+    }
+
+    fitlerBy(filter_string){
+        filter_string = filter_string.trim();
+        if(filter_string.length === 0)
+            return [];
+
+        let filterFunc = null;
+
+        if(filter_string.startsWith('/') && filter_string.endsWith('/')){
+            filter_string = filter_string.slice(1, -1);
+            let re = null;
+            try{
+                re = new RegExp(filter_string, 'i');
+            }catch (e){
+                return [];
+            }
+            filterFunc = (str) => re.test(str);
+        }else{
+            filter_string = filter_string.toLowerCase();
+            filterFunc = (str) => str.toLowerCase().includes(filter_string);
+        }
+
+        const videos = this.model.getVideos();
+        return videos.filter(video_data => {
+            return filterFunc(video_data.title);
+        });
     }
 }
