@@ -431,7 +431,6 @@ class FilterGroupedNotAndOr{
 
 class FilterCommaSeparator{
     test(str){
-        console.log(str, str.includes(','));
         return str.includes(',');
     }
 
