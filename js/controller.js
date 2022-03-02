@@ -313,32 +313,131 @@ class Controler{
 class FilterController{
     constructor(model){
         this.model = model;
+        this.filters = [
+            new FilterStatic(),
+            new FilterRegEx(),
+            new FilterGroupedNotAndOr(),
+            new FilterCommaSeparator()
+        ]
     }
 
-    fitlerBy(filter_string){
-        filter_string = filter_string.trim();
-        if(filter_string.length === 0)
+    fitlerBy(str){
+        str = str.trim();
+        if(str.length === 0)
             return [];
 
-        let filterFunc = null;
-
-        if(filter_string.startsWith('/') && filter_string.endsWith('/')){
-            filter_string = filter_string.slice(1, -1);
-            let re = null;
-            try{
-                re = new RegExp(filter_string, 'i');
-            }catch (e){
-                return [];
+        let filterFunc;
+        let filterFuncs = [];
+        for(let filter of this.filters){
+            if(!filter.test(str))
+                continue;
+            filterFunc = filter.getFilter(str);
+            if(filterFunc === false){
+                continue;
             }
-            filterFunc = (str) => re.test(str);
-        }else{
-            filter_string = filter_string.toLowerCase();
-            filterFunc = (str) => str.toLowerCase().includes(filter_string);
+            filterFuncs.push(filterFunc);
         }
+
+        if(!filterFuncs.length)
+            return [];
 
         const videos = this.model.getVideos();
         return videos.filter(video_data => {
-            return filterFunc(video_data.title);
+            return filterFuncs.some(filterFunc => filterFunc(video_data.title));
         });
+    }
+
+}
+
+class FilterStatic{
+    test(str){
+        return true;
+    }
+
+    getFilter(str){
+        let lowerCaseStr = str.toLowerCase();
+        return (source) => source.toLowerCase().includes(lowerCaseStr);
+    }
+}
+
+class FilterRegEx{
+    test(str){
+        return /^\/.*\/$/.test(str);
+    }
+
+    getFilter(str){
+        str = str.slice(1, -1);
+        let re = null;
+        try{
+            re = new RegExp(str, 'i');
+        }catch (e){
+            return false;
+        }
+        return (source) => re.test(source);
+    }
+}
+
+class FilterGroupedNotAndOr{
+    static AND = '&&';
+    static OR = '||'
+    static NOT = '!'
+    static ALLOWED_GROUP_PAIRS = [
+        ['(', ')'],
+        ['[', ']'],
+        ['{', '}']
+    ];
+
+/*
+((capleton || (chronixx && jah9)) && !(bob) )
+
+
+(
+    values: [1,capleton]
+    operators: [||,&&]
+    (1
+        values: [chronixx, jah9]
+        operators: [&&]
+    )
+)
+*/
+
+    static Node = class{
+        constructor() {
+            this.values = [];
+            this.operators = [];
+        }
+    }
+
+    test(str){
+        return false;
+        //this.constructor.ALLOWED_GROUP_PAIRS.some(([o,c]) => str.startsWith(c) && str.endsWith(c));
+    }
+
+    getFilter(str){
+        const $AND = this.constructor.AND;
+        const $OR = this.constructor.OR;
+        const $NOT = this.constructor.NOT;
+        const [$O, $C] = [str[0], str[str.length-1]];
+        const N = this.constructor.Node;
+
+        str = str.slice(1, -1);
+        const rootNode = N();
+        for(let i=0; i<str.length;){
+
+        }
+        return false
+    }
+}
+
+class FilterCommaSeparator{
+    test(str){
+        console.log(str, str.includes(','));
+        return str.includes(',');
+    }
+
+    getFilter(str){
+        str = str.toLowerCase();
+        const strs = str.toLowerCase().split(',').map(x=>x.trim()).filter(x=>x.length);
+        return (source) => strs.some(s => source.toLowerCase().includes(s));
     }
 }
