@@ -46,7 +46,8 @@ class Controler{
     }
 
     async _fetchVideosById(id){
-        if(id.length === 11){
+        const YT_VIDEO_ID_LENGTH = 11;
+        if(id.length === YT_VIDEO_ID_LENGTH){
             let video = await this._fetchVideo(id);
             return video ? [video] : [];
         }else{
