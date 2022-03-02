@@ -47,14 +47,15 @@ class Controler{
 
     async _fetchVideosById(id){
         if(id.length === 11){
-            return [await this._fetchVideo((id))];
+            let video = await this._fetchVideo(id);
+            return video ? [video] : [];
         }else{
             return await this._fetchPlaylist(id);
         }
     }
 
     async _fetchVideo(video_id){
-        let request_url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&fields=items/snippet(title,thumbnails/default/url)&id=";
+        let request_url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&part=status&videoEmbeddable=true&fields=items(status,snippet(title,thumbnails/default/url))&id=";
         request_url += video_id + "&key=" + this.api_key;
 
         const response = await fetch(request_url);
@@ -62,6 +63,13 @@ class Controler{
             throw new Error("Response status " + response.status);
 
         const resp_json = await response.json()
+        if(resp_json.items.length < 1)
+            return false;
+
+        if(resp_json.items[0].status.privacyStatus !== "public"){
+            this.model.addFailedVideo(videoId);
+            return false;
+        }
         const snippet = resp_json.items[0].snippet;
         const thumbnail = snippet.thumbnails.default ? snippet.thumbnails.default.url : null;
 
@@ -73,7 +81,7 @@ class Controler{
     }
 
     async _fetchPlaylistPage(playlist_id, page_token=null, max_results=50){
-        let request_url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&fields=items/snippet(resourceId/videoId,title,thumbnails/default/url),nextPageToken&playlistId=";
+        let request_url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&part=status&videoEmbeddable=true&fields=items(status,snippet(resourceId/videoId,title,thumbnails/default/url)),nextPageToken&playlistId=";
         request_url += playlist_id + "&key=" + this.api_key + "&maxResults=" + max_results;
         if(page_token){
             request_url += "&pageToken=" + page_token;
@@ -95,6 +103,10 @@ class Controler{
 
             response.items.forEach(item => {
                 const videoId = item.snippet.resourceId.videoId;
+                if(item.status.privacyStatus !== "public"){
+                    this.model.addFailedVideo(videoId);
+                    return false;
+                }
                 const title = item.snippet.title;
                 const thumbnail = item.snippet.thumbnails.default ? item.snippet.thumbnails.default.url : null;
 
@@ -165,6 +177,10 @@ class Controler{
     }
 
     playVideo = (video) => {
+        if(!video || !video.id){
+            this.playNextVideo();
+            return;
+        }
         this.current_video_index = video.idx;
         this.view.setIframeTitle(video.title);
         this.view.setUrlVideoId(video.id);
@@ -178,7 +194,8 @@ class Controler{
     playNextVideo = () => {
         if(this.current_video_index !== null)
             this.model.pushVideoHistory(this.current_video_index);
-        this.playVideo(this.model.shiftVideoQueue(false));
+        if(this.model.getVideoQueue().length >= 1)
+            this.playVideo(this.model.shiftVideoQueue(false));
     }
     playPreviousVideo = () => {
         const video = this.model.popVideoHistory(false);

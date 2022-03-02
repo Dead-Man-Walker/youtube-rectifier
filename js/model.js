@@ -15,6 +15,7 @@ class Model extends EventTarget{
         this.videos = [];
         this.video_queue = [];
         this.video_history = [];
+        this.failed_videos = [];
         this.identifiers = new Set();
 
         this.shuffle = false;
@@ -88,6 +89,13 @@ class Model extends EventTarget{
             return null;
         this.dispatchEvent(new Event(Model.EVENTS.VIDEO_HISTORY_CHANGED));
         return index_only ? v_idx : this.videos[v_idx];
+    }
+
+    getFailedVideos(){
+        return this.failed_videos;
+    }
+    addFailedVideo(videoId){
+        this.failed_videos.push(videoId);
     }
 
     removeIdentifiers(){
