@@ -182,6 +182,15 @@ class View extends EventTarget{
         window.history.pushState({}, "", parsed_url.href);
     }
 
+    getUrlVideoId(){
+        let parsed_url = new URL(document.location);
+        return parsed_url.searchParams.get("videoid");
+    }
+    setUrlVideoId(videoId){
+        let parsed_url = new URL(document.location);
+        parsed_url.searchParams.set("videoid", videoId);
+        window.history.pushState({}, "", parsed_url.href);
+    }
 }
 
 

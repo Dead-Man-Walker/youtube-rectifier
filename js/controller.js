@@ -141,10 +141,8 @@ class Controler{
 
     async addVideosByIdentifier(identifier){
         const id = this._getIdFromIdentifier(identifier);
-        if(id == null){
-            console.log("Invalid identifier! " + id);
+        if(id == null)
             return;
-        }
         if(this.model.hasIdentifier((id)))
             return;
         const videos = await this._fetchVideosById(id);
@@ -169,6 +167,7 @@ class Controler{
     playVideo = (video) => {
         this.current_video_index = video.idx;
         this.view.setIframeTitle(video.title);
+        this.view.setUrlVideoId(video.id);
 	    this.player.loadVideoById({
             "videoId" : video.id,
             "suggestedQuality" : "large"
@@ -277,12 +276,20 @@ class Controler{
             }
         });
     }
-    onYouTubePlayerReady = (event) => {
+    onYouTubePlayerReady = async (event) => {
         this.view.enableLoadVideosForm(true);
         const shuffle_state = this.view.getUrlShuffle()
         this.model.setShuffle(shuffle_state);
         this.view.setVideoOrdered(!shuffle_state);
-        this.addVideosFromUrl();
+        let urlVideoId = this.view.getUrlVideoId();
+        await this.addVideosFromUrl();
+        if(urlVideoId){
+            let urlVideo = this.model.getVideos().filter(video => video.id === urlVideoId);
+            if(urlVideo.length === 1){
+                this.playVideo(urlVideo[0]);
+            }
+        }
+
     }
     onYouTubePlayerStateChange = (event) => {
         if(event.data === YT.PlayerState.ENDED) {
