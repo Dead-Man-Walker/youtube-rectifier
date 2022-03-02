@@ -56,7 +56,7 @@ class Controler{
     }
 
     async _fetchVideo(video_id){
-        let request_url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&part=status&videoEmbeddable=true&fields=items(status,snippet(title,thumbnails/default/url))&id=";
+        let request_url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&part=status&videoEmbeddable=true&fields=items(id,status,snippet(title,thumbnails/default/url))&id=";
         request_url += video_id + "&key=" + this.api_key;
 
         const response = await fetch(request_url);
@@ -64,21 +64,10 @@ class Controler{
             throw new Error("Response status " + response.status);
 
         const resp_json = await response.json()
-        if(resp_json.items.length < 1)
-            return false;
-
-        if(resp_json.items[0].status.privacyStatus !== "public"){
-            this.model.addFailedVideo(videoId);
-            return false;
-        }
-        const snippet = resp_json.items[0].snippet;
-        const thumbnail = snippet.thumbnails.default ? snippet.thumbnails.default.url : null;
-
-        return {
-            "id": video_id,
-            "title" : snippet.title,
-            "thumbnail": thumbnail
-        };
+        let videos = this._createVideoDataFromJsonApiResponse(resp_json);
+        if(videos.length !== 1)
+            return false
+        return videos[0];
     }
 
     async _fetchPlaylistPage(playlist_id, page_token=null, max_results=50){
@@ -96,33 +85,36 @@ class Controler{
     }
 
     async _fetchPlaylist(playlist_id){
-        let playlist_data = [];
         let current_page = null;
+        let videos = [];
 
         while(true){
             const response = await this._fetchPlaylistPage(playlist_id, current_page);
-
-            response.items.forEach(item => {
-                const videoId = item.snippet.resourceId.videoId;
-                if(item.status.privacyStatus !== "public"){
-                    this.model.addFailedVideo(videoId);
-                    return false;
-                }
-                const title = item.snippet.title;
-                const thumbnail = item.snippet.thumbnails.default ? item.snippet.thumbnails.default.url : null;
-
-                playlist_data.push({
-                    "id": videoId,
-                    "title": title,
-                    "thumbnail": thumbnail
-                })
-            });
-
+            videos = [...videos, ...this._createVideoDataFromJsonApiResponse(response)];
             current_page = response.nextPageToken;
             if (!current_page) break;
         }
 
-        return playlist_data;
+        return videos;
+    }
+
+    _createVideoDataFromJsonApiResponse(json_response){
+        let videos = [];
+        let videoId;
+        json_response.items.forEach(item => {
+            videoId = item.id || item.snippet.resourceId.videoId;
+            if(item.status.privacyStatus !== "public"){
+                this.model.addFailedVideo(videoId);
+                return false;
+            }
+
+            videos.push({
+                "id": videoId,
+                "title": item.snippet.title,
+                "thumbnail": item.snippet.thumbnails.default ? item.snippet.thumbnails.default.url : null
+            })
+        });
+        return videos;
     }
 
     _getIdFromIdentifier = identifier => {
