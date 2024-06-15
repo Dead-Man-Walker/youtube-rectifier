@@ -12,6 +12,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/tooltip.css">
+    <link rel="stylesheet" href="css/video_player.css">
+    <link rel="stylesheet" href="css/video_queue.css">
+    <script src="js/app.js" type="module" defer></script>
 </head>
 
 
@@ -28,55 +32,63 @@
 </header>
 
 
-<main>
-    <fieldset id="load-videos-fieldset" disabled>
+<main v-scope="YoutubePlayer({youtubeApiKey: 'AIzaSyCt7PkKtIlJl_uVw-lRpymNR49lD919gFQ'})">
+    <fieldset id="load-videos-fieldset" :disabled="!isReady">
         <div>
-            <input id="load-videos-input" placeholder="YouTube ID or URL" type="text" required />
-            <input class="green fa" id="load-videos-submit" value="&#xf067;   Add" type="submit" />
-            <input class="red fa" id="clear-videos-submit" value="&#xf068;   Clear All" type="submit" />
+            <input id="load-videos-input" placeholder="YouTube ID or URL" type="text" v-model="videoIdentifier" required />
+            <input class="green fa" id="load-videos-submit" value="&#xf067;   Add" type="submit" @click="fetchVideosByIdentifier(videoIdentifier)" />
+            <input class="red fa" id="clear-videos-submit" value="&#xf068;   Clear All" type="submit" @click="" />
         </div>
     </fieldset>
 
     <div>
         <div>
-            <h3 id="iframe-title"></h3>
-            <div id="iframe-placeholder"></div>
+            <h3 id="video-title">{{ currentVideo?.title }}</h3>
+            <div id="video-player-wrapper">
+                <div id="video-player" @vue:mounted="mounted($el)"></div>
+            </div>
         </div>
 
-        <fieldset id="video-controls-fieldset" disabled>
-            <div>
+        <div v-scope="VideoQueue({ videoQueue: Store.videos })">
+            <fieldset id="video-controls-fieldset" :disabled="!isReady">
                 <div>
-                    <button style="display: none" class="yellow" id="video-controls-randomized" type="button" v-scope="Tooltip({ tooltip: 'Randomized' })" @vue:mounted="mounted()"><i class="fa fa-random"></i><span>Randomized</span></button>
-                    <button style="display: none" class="yellow" id="video-controls-ordered" type="button" data-tooltip="Ordered"><i class="fa fa-exchange"></i><span>Ordered</span></button>
+                    <div>
+                        <button style="display: none" class="yellow" id="video-controls-randomized" type="button"><i class="fa fa-random"></i><span>Randomized</span></button>
+                        <button style="display: none" class="yellow" id="video-controls-ordered" type="button"><i class="fa fa-exchange"></i><span>Ordered</span></button>
+                    </div>
+
+                    <button class="blue" id="video-controls-previous" type="button" data-tooltip="Previous"><i class="fa fa-toggle-left"></i><span>Previous</span></button>
+                    <button class="blue" id="video-controls-next" type="button" data-tooltip="Next"><i class="fa fa-toggle-right"></i><span>Next</span></button>
                 </div>
+            </fieldset>
 
-                <button class="blue" id="video-controls-previous" type="button" data-tooltip="Previous"><i class="fa fa-toggle-left"></i><span>Previous</span></button>
-                <button class="blue" id="video-controls-next" type="button" data-tooltip="Next"><i class="fa fa-toggle-right"></i><span>Next</span></button>
-            </div>
-        </fieldset>
+            <fieldset id="video-search-fieldset">
+                <div>
+                    <input id="search-videos-input" placeholder="Search and filter" type="text" />
+                    <span v-scope="Tooltip({tooltip: 'Special syntax:<br>* RegEx: Wrap search string with a slash (/).<br>Example: &quot;/(capleton|sizzla).*feat/&quot;'})" @vue:mounted="mounted($el)">
+                        <i class="fa fa-question-circle"></i>
+                    </span>
+                </div>
+            </fieldset>
 
-        <fieldset id="video-search-fieldset">
-            <div>
-                <input id="search-videos-input" placeholder="Search and filter" type="text" />
-                <span data-tooltip="Special syntax:<br>* RegEx: Wrap search string with a slash (/).<br>Example: &quot;/(capleton|sizzla).*feat/&quot;"><i class="fa fa-question-circle"></i></span>
+            <div id="video-queue">
+                <div v-for="(video, videoId) in videoQueue" class="video-queue-item" :data-video-id="videoId" @click="onClickVideo(video)">
+                    <img :src="video.thumbnail" :alt="'Thumbnail of video ' + video.title" class="video-queue-item-thumbnail">
+                    <span class="video-queue-item-title">{{ video.title }}</span>
+                </div>
             </div>
-        </fieldset>
+        </div>
     </div>
 </main>
 
-<div id="video-list"></div>
-
-<script src="https://unpkg.com/petite-vue"></script>
-<script src="js/tooltip.js"></script>
-<script src="js/app.js"></script>
-
+<!--
 <script src="https://github.com/mde/ejs/releases/download/v3.0.2/ejs.min.js"></script>
 <script src="js/helper.js"></script>
 <script src="js/controller.js"></script>
 <script src="js/model.js"></script>
 <script src="js/view.js"></script>
 <script src="js/index.js"></script>
-
+-->
 </body>
 </html>
 

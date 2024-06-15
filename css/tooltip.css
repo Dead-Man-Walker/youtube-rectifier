@@ -1,0 +1,16 @@
+.tooltip-parent{
+    position: relative;
+}
+
+.tooltip{
+    position: absolute;
+    color: black;
+    padding: 1rem;
+    border-radius: 3px;
+    background: white;
+    box-shadow: #444 0 0 15px;
+    width: max-content;
+    line-height: 1.25;
+    font-size: 1rem;
+    font-weight: normal;
+}

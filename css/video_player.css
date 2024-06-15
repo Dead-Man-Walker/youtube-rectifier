@@ -1,0 +1,12 @@
+#video-title{
+    background-color: black;
+    color: white;
+    font-size: 14px;
+    padding: 8px;
+}
+
+#video-player-wrapper{
+    min-height: 360px;
+    min-width: 640px;
+    background-color: black;
+}

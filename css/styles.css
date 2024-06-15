@@ -89,12 +89,7 @@ main > * {
     margin: 15px;
 }
 
-#iframe-title{
-    background-color: black;
-    color: white;
-    font-size: 14px;
-    padding: 8px;
-}
+
 
 #load-videos-fieldset{
     max-width: var(--yt-player-width);
