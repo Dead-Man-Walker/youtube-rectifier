@@ -1,3 +1,8 @@
+#load-videos-fieldset{
+    display: flex;
+    padding: 1rem 0;
+}
+
 #video-title{
     background-color: black;
     color: white;

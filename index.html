@@ -1,94 +1,96 @@
 <!doctype html>
 
 <html lang="en" xmlns="http://www.w3.org/1999/html">
-<head>
-    <meta charset="utf-8">
+    <head>
+        <meta charset="utf-8">
 
-    <title>YouTube Rectifier</title>
-    <meta name="description" content="Rectifier for YouTube's broken playlist shuffle mode">
-    <meta name="author" content="Kevin Hambrecht">
-    <link rel="icon" type="image/png" href="images/ytr_logo_32.png" sizes="16x16">
+        <title>YouTube Rectifier</title>
+        <meta name="description" content="Rectifier for YouTube's broken playlist shuffle mode">
+        <meta name="author" content="Kevin Hambrecht">
+        <link rel="icon" type="image/png" href="images/ytr_logo_32.png" sizes="16x16">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/tooltip.css">
-    <link rel="stylesheet" href="css/video_player.css">
-    <link rel="stylesheet" href="css/video_queue.css">
-    <script src="js/app.js" type="module" defer></script>
-</head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!--
+        <link rel="stylesheet" href="css/reset.css">
+        <link rel="stylesheet" href="css/styles.css">
+        <link rel="stylesheet" href="css/tooltip.css">
+        <link rel="stylesheet" href="css/video_player.css">
+        <link rel="stylesheet" href="css/video_queue.css">
+        -->
+        <script src="js/app.js" type="module" defer></script>
+    </head>
 
+    <body class="box-border bg-blue-400">
+        <header class="flex justify-center my-14 mx-auto text-white font-bold">
+            <div>
+                <div class="flex flex-nowrap justify-center p-4 border-8">
+                    <img class="w-14 h-14 mr-4 self-center" src="images/ytr_logo_128.png">
+                    <h1 class="text-center text-5xl self-center tracking-widest">YouTube Rectifier</h1>
+                </div>
 
-<body>
-<header>
-    <div>
-        <div id="header-main">
-            <img src="images/ytr_logo_128.png">
-            <h1>YouTube Rectifier</h1>
-        </div>
-        <br>
-        <h2>'Cause YouTube can't...</h2>
-    </div>
-</header>
-
-
-<main v-scope="YoutubePlayer({youtubeApiKey: 'AIzaSyCt7PkKtIlJl_uVw-lRpymNR49lD919gFQ'})">
-    <fieldset id="load-videos-fieldset" :disabled="!isReady">
-        <div>
-            <input id="load-videos-input" placeholder="YouTube ID or URL" type="text" v-model="videoIdentifier" required />
-            <input class="green fa" id="load-videos-submit" value="&#xf067;   Add" type="submit" @click="fetchVideosByIdentifier(videoIdentifier)" />
-            <input class="red fa" id="clear-videos-submit" value="&#xf068;   Clear All" type="submit" @click="" />
-        </div>
-    </fieldset>
-
-    <div>
-        <div>
-            <h3 id="video-title">{{ currentVideo?.title }}</h3>
-            <div id="video-player-wrapper">
-                <div id="video-player" @vue:mounted="mounted($el)"></div>
+                <h2 class="mt-5 tracking-widest">'Cause YouTube can't...</h2>
             </div>
-        </div>
+        </header>
 
-        <div v-scope="VideoQueue({ videoQueue: Store.videos })">
-            <fieldset id="video-controls-fieldset" :disabled="!isReady">
-                <div>
+        <main v-scope="YoutubePlayer({youtubeApiKey: 'AIzaSyCt7PkKtIlJl_uVw-lRpymNR49lD919gFQ'})" @vue:mounted="mounted($el)">
+            <div class="flex justify-center">
+                <div class="flex flex-col gap-4">
+                    <fieldset class="flex flex-nowrap h-12" :disabled="!isReady">
+                        <input class="flex-grow p-2" placeholder="YouTube ID or URL" type="text" v-model="videoIdentifier" required />
+                        <input class="h-12 w-12 bg-green-600 text-white fa" value="&#xf067" type="submit" @click="fetchVideosByIdentifier(videoIdentifier)" />
+                    </fieldset>
+
                     <div>
-                        <button style="display: none" class="yellow" id="video-controls-randomized" type="button"><i class="fa fa-random"></i><span>Randomized</span></button>
-                        <button style="display: none" class="yellow" id="video-controls-ordered" type="button"><i class="fa fa-exchange"></i><span>Ordered</span></button>
+                        <div id="video-player"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 auto-rows-auto gap-4">
+                <div v-scope="VideoHistory()" class="p-4" @vue:mounted="mounted()">
+                    <div v-scope="VideoList({videoIdList: videoIdList})"></div>
+                </div>
+
+                <div v-scope="VideoQueue()" class="p-4" @vue:mounted="mounted()">
+                    <div class="flex flex-nowrap justify-between">
+                        <button class="h-12 w-12 bg-green-600 text-white" @click="playPrevious()">
+                            <i class="fa fa-toggle-left"></i>
+                        </button>
+
+                        <h3 class="flex-grow flex justify-center items-center">
+                            {{ currentVideo?.title || 'Warte auf Video...' }}
+                        </h3>
+
+                        <button class="h-12 w-12 bg-green-600 text-white" @click="playNext()">
+                            <i class="fa fa-toggle-right"></i>
+                        </button>
                     </div>
 
-                    <button class="blue" id="video-controls-previous" type="button" data-tooltip="Previous"><i class="fa fa-toggle-left"></i><span>Previous</span></button>
-                    <button class="blue" id="video-controls-next" type="button" data-tooltip="Next"><i class="fa fa-toggle-right"></i><span>Next</span></button>
-                </div>
-            </fieldset>
+                    <fieldset>
+                        <div>
+                            <input id="search-videos-input" placeholder="Search and filter" type="text" />
+                            <span v-scope="Tooltip({tooltip: 'Special syntax:<br>* RegEx: Wrap search string with a slash (/).<br>Example: &quot;/(capleton|sizzla).*feat/&quot;'})" @vue:mounted="mounted($el)">
+                            <i class="fa fa-question-circle"></i>
+                        </span>
+                        </div>
+                    </fieldset>
 
-            <fieldset id="video-search-fieldset">
-                <div>
-                    <input id="search-videos-input" placeholder="Search and filter" type="text" />
-                    <span v-scope="Tooltip({tooltip: 'Special syntax:<br>* RegEx: Wrap search string with a slash (/).<br>Example: &quot;/(capleton|sizzla).*feat/&quot;'})" @vue:mounted="mounted($el)">
-                        <i class="fa fa-question-circle"></i>
-                    </span>
-                </div>
-            </fieldset>
-
-            <div id="video-queue">
-                <div v-for="(video, videoId) in videoQueue" class="video-queue-item" :data-video-id="videoId" @click="onClickVideo(video)">
-                    <img :src="video.thumbnail" :alt="'Thumbnail of video ' + video.title" class="video-queue-item-thumbnail">
-                    <span class="video-queue-item-title">{{ video.title }}</span>
+                    <div v-scope="VideoList({videoIdList: videoIdList})"></div>
                 </div>
             </div>
-        </div>
-    </div>
-</main>
+        </main>
+    </body>
 
-<!--
-<script src="https://github.com/mde/ejs/releases/download/v3.0.2/ejs.min.js"></script>
-<script src="js/helper.js"></script>
-<script src="js/controller.js"></script>
-<script src="js/model.js"></script>
-<script src="js/view.js"></script>
-<script src="js/index.js"></script>
--->
-</body>
+    <template id="video-list-template">
+        <div v-for="videoId in videoIdList.getVideos()"
+             class="group hover:bg-white hover:outline hover:outline-white hover:outline-2 flex flex-nowrap h-10 items-center gap-4 cursor-pointer"
+             :data-video-id="Store.getVideo(videoId).id"
+             @click="onClickVideo(videoId)"
+        >
+            <img class="h-full" :src="Store.getVideo(videoId).thumbnail" :alt="'Thumbnail of video ' + Store.getVideo(videoId).title" height="40">
+            <span class="text-white group-hover:text-blue-400">{{ Store.getVideo(videoId).title }}</span>
+        </div>
+    </template>
 </html>
 

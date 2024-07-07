@@ -80,9 +80,11 @@ header h2{
 main{
     margin: 0 auto;
     max-width: calc(var(--yt-player-width) + var(--load-videos-width));
+    /*
     display: flex;
     flex-flow: row-reverse wrap;
     justify-content: center;
+     */
     background-color: var(--second-color);
 }
 main > * {
@@ -90,7 +92,7 @@ main > * {
 }
 
 
-
+/*
 #load-videos-fieldset{
     max-width: var(--yt-player-width);
     flex: 1 1 auto;
@@ -115,6 +117,7 @@ main > * {
 #load-videos-fieldset > div :last-child{
     margin-bottom: 0;
 }
+ */
 
 #iframe-placeholder{
     max-width: 100%;

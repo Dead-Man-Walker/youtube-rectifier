@@ -1,6 +1,6 @@
+import {Observable} from "./helper.js";
 
 /* YouTubbe Iframe API: https://developers.google.com/youtube/iframe_api_reference */
-
 export default function YoutubePlayer(props){
     return {
         _youtubeApiKey: props.youtubeApiKey,
@@ -10,6 +10,8 @@ export default function YoutubePlayer(props){
         isReady: false,
         videoIdentifier: '',
         currentVideo: null,
+        onPlayerStateChange: new Observable(),
+        onPlayerError: new Observable(),
 
         mounted($el) { // calls "onYouTubeIframeAPIReady"
             this._$rootEl = $el;
@@ -18,9 +20,16 @@ export default function YoutubePlayer(props){
             tag.src = "https://www.youtube.com/iframe_api";
             let firstScriptTag = document.getElementsByTagName('script')[0];
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            this.addVideosFromUrl();
         },
 
         playVideo(video){
+            if(typeof video === "string")
+                video = this.Store.getVideo(video);
+
+            if(!video)
+                return false;
+
             this.currentVideo = video;
             //this.view.setIframeTitle(video.title);
             //this.view.setUrlVideoId(video.id);
@@ -29,14 +38,30 @@ export default function YoutubePlayer(props){
                 "suggestedQuality" : "large"
             });
             this._youtubePlayer.playVideo();
+            return true;
         },
 
         async fetchVideosByIdentifier(identifier){
             const id = this._getIdFromIdentifier(identifier);
+
             if(id == null)
-                return;
+                return Promise.resolve();
+
             await this._fetchVideosById(id);
+            this.Store.addIdentifier(identifier);
             this.videoIdentifier = '';
+        },
+
+
+        async addVideosFromUrl(){
+            const parsed_url = new URL(window.location);
+            const identifiers = parsed_url.searchParams.getAll("identifiers");
+
+            if(identifiers.length === 0)
+                return;
+
+            const promises = identifiers.map(this.fetchVideosByIdentifier.bind(this));
+            await Promise.all(promises);
         },
 
         async _fetchVideosById(id) {
@@ -140,7 +165,7 @@ export default function YoutubePlayer(props){
 
         // Called by YouTube Iframe API
         _onYouTubeIframeAPIReady(){
-            this._youtubePlayer = new YT.Player(this._$rootEl, {
+            this._youtubePlayer = new YT.Player(this._$rootEl.querySelector('#video-player'), {
                 height: "360",
                 width: "640",
                 playerVars: {
@@ -157,32 +182,49 @@ export default function YoutubePlayer(props){
 
         _onYouTubePlayerReady(event){
             this.isReady = true;
+            this.onPlayerStateChange.fire('READY');
         },
 
         _onYouTubePlayerStateChange(event){
-            if (event.data === YT.PlayerState.ENDED) {
-                //this.playNextVideo();
+            const STATE_MAP = {
+                [YT.PlayerState.UNSTARTED]: 'UNSTARTED',
+                [YT.PlayerState.ENDED]: 'ENDED',
+                [YT.PlayerState.PLAYING]: 'PLAYING',
+                [YT.PlayerState.PAUSED]: 'PAUSED',
+                [YT.PlayerState.BUFFERING]: 'BUFFERING',
             }
+
+            const state = STATE_MAP[event.data];
+
+            if(state)
+                this.onPlayerStateChange.fire(state);
         },
 
         _onYouTubePlayerError(event){
-            switch(event.data){
-                case 2: // Invalid parameter value
-                    console.error("Invalid parameter value", event);
-                    break;
-                case 5: // HTML5-Player related error
-                    console.error("HTML5-Player failed to handle this video", event);
-                    break;
-                case 100: // Video not found (deleted or set private)
-                    console.error("Video not found (deleted or set private)", event);
-                    break;
-                case 101: // Owner doesn't allow video embedding
-                case 150:
-                    console.error("Owner doesn't allow video embedding", event);
-                    break;
-            }
+            const ERROR_MAP = {
+                2: {
+                    name: 'INVALID_PARAMETER_VALUE',
+                    message: 'Invalid parameter value'
+                },
+                5: {
+                    name: 'HTML5_PLAYER_ERROR',
+                    message: 'HTML5-Player failed to handle this video'
+                },
+                100: {
+                    name: 'NOT_FOUND',
+                    message: 'Video not found (deleted or set private)'
+                },
+                101: {
+                    name: 'EMBEDDING_FORBIDDEN',
+                    message: 'Owner doesn\'t allow video embedding'
+                },
+                105: ERROR_MAP[101]
+            };
 
-            //this.playNextVideo();
+            const error = ERROR_MAP[event.data];
+
+            if(error)
+                this.onPlayerError.fire(error.name, error.message);
         }
     }
 };

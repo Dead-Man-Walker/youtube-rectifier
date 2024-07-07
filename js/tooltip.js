@@ -19,7 +19,7 @@ export default function Tooltip(props){
 
         _addEventListeners(){
             this._assertInit();
-            this._$parentEl.classList.add('tooltip-parent')
+            this._$parentEl.classList.add('tooltip-parent', 'relative')
             this._$parentEl.addEventListener('click', () => this.toggle());
             this._$parentEl.addEventListener('mouseenter', () => this.showDelayed());
             this._$parentEl.addEventListener('mouseleave', () => this.hide());
@@ -42,7 +42,8 @@ export default function Tooltip(props){
 
             this._clearTimeout();
             this._$tooltipEl = document.createElement('DIV');
-            this._$tooltipEl.classList.add('tooltip');
+            this._$tooltipEl.classList.add('tooltip', 'absolute', 'text-black', 'w-max',
+                'bg-white', 'p-1', 'leading-tight', 'rounded-md', 'text-base', 'font-normal', 'shadow-md');
             this._$tooltipEl.innerHTML = this.tooltip;
             this._$parentEl.appendChild(this._$tooltipEl);
         },
